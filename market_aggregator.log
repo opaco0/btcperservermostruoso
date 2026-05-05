@@ -1,0 +1,900 @@
+2026-05-03 02:11:53,087 [INFO] uvicorn.error: Started server process [25620]
+2026-05-03 02:11:53,089 [INFO] uvicorn.error: Waiting for application startup.
+2026-05-03 02:11:53,090 [INFO] aggregator: Aggregatore avviato — versione produzione 24h
+2026-05-03 02:11:53,156 [INFO] aggregator.data_fetcher: Scarico Orderbook completo iniziale...
+2026-05-03 02:11:53,176 [INFO] aggregator: Motore di Background avviato
+2026-05-03 02:11:53,211 [INFO] uvicorn.error: Application startup complete.
+2026-05-03 02:11:53,215 [INFO] uvicorn.error: Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+2026-05-03 02:13:37,208 [INFO] uvicorn.error: 127.0.0.1:51219 - "WebSocket /ws" [accepted]
+2026-05-03 02:13:37,211 [INFO] aggregator: Client WS connesso. Totale: 1
+2026-05-03 02:13:37,220 [INFO] uvicorn.error: connection open
+2026-05-03 02:19:47,205 [INFO] uvicorn.error: Started server process [25160]
+2026-05-03 02:19:47,206 [INFO] uvicorn.error: Waiting for application startup.
+2026-05-03 02:19:47,207 [INFO] aggregator: Aggregatore avviato — versione produzione 24h
+2026-05-03 02:19:47,274 [INFO] aggregator.data_fetcher: Scarico Orderbook completo iniziale...
+2026-05-03 02:19:47,299 [INFO] aggregator: Motore di Background avviato
+2026-05-03 02:19:47,328 [INFO] aggregator: Caricate 800 candele dal DB
+2026-05-03 02:19:47,333 [INFO] aggregator: Caricati 659 trade dal DB
+2026-05-03 02:19:47,342 [INFO] uvicorn.error: Application startup complete.
+2026-05-03 02:19:47,345 [INFO] uvicorn.error: Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+2026-05-03 02:19:47,649 [INFO] aggregator: Caricati 50 bucket heatmap 1m dal DB
+2026-05-03 02:19:47,942 [INFO] aggregator: Caricati 21 bucket heatmap 5m dal DB
+2026-05-03 02:19:48,047 [INFO] aggregator: Caricati 6 bucket heatmap 15m dal DB
+2026-05-03 02:19:48,143 [INFO] aggregator: Caricati 2 bucket heatmap 1h dal DB
+2026-05-03 02:19:48,181 [INFO] aggregator: Caricati 1 bucket heatmap 4h dal DB
+2026-05-03 02:19:48,225 [INFO] aggregator: Caricati 1 bucket heatmap 1d dal DB
+2026-05-03 02:20:48,170 [INFO] uvicorn.error: 127.0.0.1:51361 - "WebSocket /ws" [accepted]
+2026-05-03 02:20:48,171 [INFO] aggregator: Client WS connesso. Totale: 1
+2026-05-03 02:20:48,174 [INFO] uvicorn.error: connection open
+2026-05-03 02:52:23,344 [ERROR] uvicorn.error: keepalive ping failed
+Traceback (most recent call last):
+  File "c:\Users\seyni\AppData\Local\Programs\Python\Python313\Lib\site-packages\websockets\legacy\protocol.py", line 1233, in keepalive_ping
+    pong_waiter = await self.ping()
+                  ^^^^^^^^^^^^^^^^^
+  File "c:\Users\seyni\AppData\Local\Programs\Python\Python313\Lib\site-packages\websockets\legacy\protocol.py", line 843, in ping
+    await self.write_frame(True, OP_PING, data)
+  File "c:\Users\seyni\AppData\Local\Programs\Python\Python313\Lib\site-packages\websockets\legacy\protocol.py", line 1184, in write_frame
+    await self.drain()
+  File "c:\Users\seyni\AppData\Local\Programs\Python\Python313\Lib\site-packages\websockets\legacy\protocol.py", line 1167, in drain
+    await self._drain()
+  File "c:\Users\seyni\AppData\Local\Programs\Python\Python313\Lib\site-packages\websockets\legacy\protocol.py", line 328, in _drain
+    await self._drain_helper()
+  File "c:\Users\seyni\AppData\Local\Programs\Python\Python313\Lib\site-packages\websockets\legacy\protocol.py", line 308, in _drain_helper
+    assert waiter is None or waiter.cancelled()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError
+2026-05-03 03:03:17,847 [INFO] aggregator: Client WS disconnesso. Rimasti: 0
+2026-05-03 03:03:17,850 [INFO] uvicorn.error: connection closed
+2026-05-03 03:18:35,632 [INFO] uvicorn.error: 127.0.0.1:50690 - "WebSocket /ws" [accepted]
+2026-05-03 03:18:35,633 [INFO] aggregator: Client WS connesso. Totale: 1
+2026-05-03 03:18:35,634 [INFO] uvicorn.error: connection open
+2026-05-03 03:24:27,118 [INFO] aggregator: Client WS disconnesso. Rimasti: 0
+2026-05-03 03:24:27,118 [INFO] uvicorn.error: connection closed
+2026-05-03 12:30:08,365 [INFO] uvicorn.error: Started server process [14088]
+2026-05-03 12:30:08,367 [INFO] uvicorn.error: Waiting for application startup.
+2026-05-03 12:30:08,370 [INFO] aggregator: Aggregatore avviato — versione produzione 24h
+2026-05-03 12:30:08,434 [INFO] aggregator.data_fetcher: Scarico Orderbook completo iniziale...
+2026-05-03 12:30:08,456 [INFO] aggregator: Motore di Background avviato
+2026-05-03 12:30:08,490 [INFO] aggregator: Caricate 800 candele dal DB
+2026-05-03 12:30:08,748 [INFO] aggregator: Caricati 30000 trade dal DB
+2026-05-03 12:30:08,758 [INFO] uvicorn.error: Application startup complete.
+2026-05-03 12:30:08,765 [INFO] uvicorn.error: Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+2026-05-03 12:30:31,262 [INFO] aggregator: Caricati 1628 bucket heatmap 1m dal DB
+2026-05-03 12:30:41,212 [INFO] aggregator: Caricati 701 bucket heatmap 5m dal DB
+2026-05-03 12:30:44,160 [INFO] aggregator: Caricati 196 bucket heatmap 15m dal DB
+2026-05-03 12:30:44,816 [INFO] aggregator: Caricati 42 bucket heatmap 1h dal DB
+2026-05-03 12:30:44,975 [INFO] aggregator: Caricati 9 bucket heatmap 4h dal DB
+2026-05-03 12:30:45,080 [INFO] aggregator: Caricati 5 bucket heatmap 1d dal DB
+2026-05-03 12:34:08,443 [INFO] uvicorn.error: 127.0.0.1:55445 - "WebSocket /ws" [accepted]
+2026-05-03 12:34:08,444 [INFO] aggregator: Client WS connesso. Totale: 1
+2026-05-03 12:34:08,448 [INFO] uvicorn.error: connection open
+2026-05-03 12:34:36,707 [INFO] aggregator: Client WS disconnesso. Rimasti: 0
+2026-05-03 12:34:36,709 [INFO] uvicorn.error: connection closed
+2026-05-03 13:40:02,121 [INFO] uvicorn.error: Started server process [7752]
+2026-05-03 13:40:02,121 [INFO] uvicorn.error: Waiting for application startup.
+2026-05-03 13:40:02,122 [INFO] aggregator: Aggregatore avviato — versione produzione 24h
+2026-05-03 13:40:02,156 [INFO] aggregator.data_fetcher: Scarico Orderbook completo iniziale...
+2026-05-03 13:40:02,167 [INFO] aggregator: Motore di Background avviato
+2026-05-03 13:40:02,183 [INFO] aggregator: Caricate 800 candele dal DB
+2026-05-03 13:40:02,269 [INFO] aggregator: Caricati 30000 trade dal DB
+2026-05-03 13:40:02,272 [INFO] uvicorn.error: Application startup complete.
+2026-05-03 13:40:02,274 [INFO] uvicorn.error: Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+2026-05-03 13:40:14,178 [INFO] aggregator: Caricati 1721 bucket heatmap 1m dal DB
+2026-05-03 13:40:14,197 [INFO] uvicorn.error: 127.0.0.1:63831 - "WebSocket /ws" [accepted]
+2026-05-03 13:40:14,198 [INFO] aggregator: Client WS connesso. Totale: 1
+2026-05-03 13:40:14,200 [INFO] uvicorn.error: connection open
+2026-05-03 13:40:14,458 [INFO] aggregator: Snapshot bin 5m: caricati 37 bucket dal DB
+2026-05-03 13:40:19,228 [INFO] aggregator: Caricati 738 bucket heatmap 5m dal DB
+2026-05-03 13:40:20,594 [INFO] aggregator: Caricati 207 bucket heatmap 15m dal DB
+2026-05-03 13:40:21,260 [INFO] aggregator: Caricati 45 bucket heatmap 1h dal DB
+2026-05-03 13:40:21,346 [INFO] aggregator: Caricati 10 bucket heatmap 4h dal DB
+2026-05-03 13:40:21,394 [INFO] aggregator: Caricati 6 bucket heatmap 1d dal DB
+2026-05-03 13:40:45,146 [INFO] aggregator: Client WS disconnesso. Rimasti: 0
+2026-05-03 13:40:45,146 [INFO] uvicorn.error: connection closed
+2026-05-03 14:05:52,676 [INFO] uvicorn.error: Started server process [11744]
+2026-05-03 14:05:52,677 [INFO] uvicorn.error: Waiting for application startup.
+2026-05-03 14:05:52,677 [INFO] aggregator: Aggregatore avviato — versione produzione 24h
+2026-05-03 14:05:52,705 [INFO] aggregator.data_fetcher: Scarico Orderbook completo iniziale...
+2026-05-03 14:05:52,716 [INFO] aggregator: Motore di Background avviato
+2026-05-03 14:05:52,731 [INFO] aggregator: Caricate 800 candele dal DB
+2026-05-03 14:05:52,779 [INFO] aggregator: Caricati 30000 trade dal DB
+2026-05-03 14:05:52,782 [INFO] uvicorn.error: Application startup complete.
+2026-05-03 14:05:52,783 [INFO] uvicorn.error: Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+2026-05-03 14:06:03,754 [INFO] aggregator: Caricati 1721 bucket heatmap 1m dal DB
+2026-05-03 14:06:08,235 [INFO] uvicorn.error: 127.0.0.1:64770 - "WebSocket /ws" [accepted]
+2026-05-03 14:06:08,269 [INFO] aggregator: Client WS connesso. Totale: 1
+2026-05-03 14:06:08,688 [INFO] uvicorn.error: connection open
+2026-05-03 14:06:08,852 [INFO] aggregator: Caricati 738 bucket heatmap 5m dal DB
+2026-05-03 14:06:12,011 [INFO] aggregator: Caricati 207 bucket heatmap 15m dal DB
+2026-05-03 14:06:12,319 [INFO] aggregator: Caricati 45 bucket heatmap 1h dal DB
+2026-05-03 14:06:12,405 [INFO] aggregator: Caricati 10 bucket heatmap 4h dal DB
+2026-05-03 14:06:12,452 [INFO] aggregator: Caricati 6 bucket heatmap 1d dal DB
+2026-05-03 16:47:13,908 [INFO] uvicorn.error: Started server process [13788]
+2026-05-03 16:47:13,909 [INFO] uvicorn.error: Waiting for application startup.
+2026-05-03 16:47:13,909 [INFO] aggregator: Aggregatore avviato — versione produzione 24h
+2026-05-03 16:47:13,932 [INFO] aggregator.data_fetcher: Scarico Orderbook completo iniziale...
+2026-05-03 16:47:13,942 [INFO] aggregator: Motore di Background avviato
+2026-05-03 16:47:13,956 [INFO] aggregator: Caricate 800 candele dal DB
+2026-05-03 16:47:14,009 [INFO] aggregator: Caricati 30000 trade dal DB
+2026-05-03 16:47:14,012 [INFO] uvicorn.error: Application startup complete.
+2026-05-03 16:47:14,014 [INFO] uvicorn.error: Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+2026-05-03 16:47:23,963 [INFO] aggregator: Caricati 1721 bucket heatmap 1m dal DB
+2026-05-03 16:47:25,933 [INFO] uvicorn.error: 127.0.0.1:64454 - "WebSocket /ws" [accepted]
+2026-05-03 16:47:25,961 [INFO] aggregator: Client WS connesso. Totale: 1
+2026-05-03 16:47:26,713 [INFO] uvicorn.error: connection open
+2026-05-03 16:47:29,987 [INFO] aggregator: Caricati 738 bucket heatmap 5m dal DB
+2026-05-03 16:47:31,570 [INFO] aggregator: Caricati 207 bucket heatmap 15m dal DB
+2026-05-03 16:47:31,842 [INFO] aggregator: Caricati 45 bucket heatmap 1h dal DB
+2026-05-03 16:47:31,911 [INFO] aggregator: Caricati 10 bucket heatmap 4h dal DB
+2026-05-03 16:47:31,955 [INFO] aggregator: Caricati 6 bucket heatmap 1d dal DB
+2026-05-03 16:50:39,690 [INFO] aggregator: Pruning DB: rimossi 48535 trade più vecchi di 6.0gg
+2026-05-03 16:51:53,420 [INFO] aggregator: Client WS disconnesso. Rimasti: 0
+2026-05-03 16:51:53,423 [INFO] uvicorn.error: connection closed
+2026-05-03 16:54:50,387 [INFO] uvicorn.error: Started server process [3856]
+2026-05-03 16:54:50,388 [INFO] uvicorn.error: Waiting for application startup.
+2026-05-03 16:54:50,388 [INFO] aggregator: Aggregatore avviato — versione produzione 24h
+2026-05-03 16:54:50,411 [INFO] aggregator.data_fetcher: Scarico Orderbook completo iniziale...
+2026-05-03 16:54:50,421 [INFO] aggregator: Motore di Background avviato
+2026-05-03 16:54:50,438 [INFO] aggregator: Caricate 800 candele dal DB
+2026-05-03 16:54:50,448 [INFO] aggregator: Caricati 5286 trade dal DB
+2026-05-03 16:54:50,451 [INFO] uvicorn.error: Application startup complete.
+2026-05-03 16:54:50,452 [INFO] uvicorn.error: Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+2026-05-03 16:54:50,933 [INFO] aggregator: Caricati 164 bucket heatmap 1m dal DB
+2026-05-03 16:54:51,167 [INFO] aggregator: Caricati 65 bucket heatmap 5m dal DB
+2026-05-03 16:54:51,245 [INFO] aggregator: Caricati 25 bucket heatmap 15m dal DB
+2026-05-03 16:54:51,274 [INFO] aggregator: Caricati 7 bucket heatmap 1h dal DB
+2026-05-03 16:54:51,288 [INFO] aggregator: Caricati 2 bucket heatmap 4h dal DB
+2026-05-03 16:54:51,300 [INFO] aggregator: Caricati 2 bucket heatmap 1d dal DB
+2026-05-03 16:54:52,318 [INFO] uvicorn.error: 127.0.0.1:57127 - "WebSocket /ws" [accepted]
+2026-05-03 16:54:52,318 [INFO] aggregator: Client WS connesso. Totale: 1
+2026-05-03 16:54:52,319 [INFO] uvicorn.error: connection open
+2026-05-03 16:56:26,766 [INFO] aggregator: Client WS disconnesso. Rimasti: 0
+2026-05-03 16:56:26,767 [INFO] uvicorn.error: connection closed
+2026-05-03 16:58:01,323 [INFO] uvicorn.error: Started server process [20156]
+2026-05-03 16:58:01,323 [INFO] uvicorn.error: Waiting for application startup.
+2026-05-03 16:58:01,324 [INFO] aggregator: Aggregatore avviato — versione produzione 24h
+2026-05-03 16:58:01,346 [INFO] aggregator.data_fetcher: Scarico Orderbook completo iniziale...
+2026-05-03 16:58:01,358 [INFO] aggregator: Motore di Background avviato
+2026-05-03 16:58:01,377 [INFO] aggregator: Caricate 800 candele dal DB
+2026-05-03 16:58:01,389 [INFO] aggregator: Caricati 6775 trade dal DB
+2026-05-03 16:58:01,392 [INFO] uvicorn.error: Application startup complete.
+2026-05-03 16:58:01,394 [INFO] uvicorn.error: Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+2026-05-03 16:58:01,933 [INFO] aggregator: Caricati 183 bucket heatmap 1m dal DB
+2026-05-03 16:58:02,209 [INFO] aggregator: Caricati 75 bucket heatmap 5m dal DB
+2026-05-03 16:58:02,315 [INFO] aggregator: Caricati 31 bucket heatmap 15m dal DB
+2026-05-03 16:58:02,362 [INFO] aggregator: Caricati 9 bucket heatmap 1h dal DB
+2026-05-03 16:58:02,380 [INFO] aggregator: Caricati 3 bucket heatmap 4h dal DB
+2026-05-03 16:58:02,394 [INFO] aggregator: Caricati 3 bucket heatmap 1d dal DB
+2026-05-03 16:58:03,129 [INFO] uvicorn.error: 127.0.0.1:50617 - "WebSocket /ws" [accepted]
+2026-05-03 16:58:03,129 [INFO] aggregator: Client WS connesso. Totale: 1
+2026-05-03 16:58:03,131 [INFO] uvicorn.error: connection open
+2026-05-03 17:07:10,200 [INFO] aggregator: Client WS disconnesso. Rimasti: 0
+2026-05-03 17:07:10,200 [INFO] uvicorn.error: connection closed
+2026-05-03 17:09:40,922 [INFO] uvicorn.error: Started server process [4292]
+2026-05-03 17:09:40,923 [INFO] uvicorn.error: Waiting for application startup.
+2026-05-03 17:09:40,923 [INFO] aggregator: Aggregatore avviato — versione produzione 24h
+2026-05-03 17:09:40,947 [INFO] aggregator.data_fetcher: Scarico Orderbook completo iniziale...
+2026-05-03 17:09:40,958 [INFO] aggregator: Motore di Background avviato
+2026-05-03 17:09:40,971 [INFO] aggregator: Caricate 800 candele dal DB
+2026-05-03 17:09:40,993 [INFO] aggregator: Caricati 13174 trade dal DB
+2026-05-03 17:09:40,997 [INFO] uvicorn.error: Application startup complete.
+2026-05-03 17:09:40,998 [INFO] uvicorn.error: Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+2026-05-03 17:09:41,998 [INFO] aggregator: Caricati 286 bucket heatmap 1m dal DB
+2026-05-03 17:09:42,448 [INFO] aggregator: Caricati 127 bucket heatmap 5m dal DB
+2026-05-03 17:09:42,640 [INFO] aggregator: Caricati 57 bucket heatmap 15m dal DB
+2026-05-03 17:09:42,762 [INFO] aggregator: Caricati 15 bucket heatmap 1h dal DB
+2026-05-03 17:09:42,781 [INFO] aggregator: Caricati 4 bucket heatmap 4h dal DB
+2026-05-03 17:09:42,798 [INFO] aggregator: Caricati 3 bucket heatmap 1d dal DB
+2026-05-03 17:09:47,336 [INFO] uvicorn.error: 127.0.0.1:62929 - "WebSocket /ws" [accepted]
+2026-05-03 17:09:47,337 [INFO] aggregator: Client WS connesso. Totale: 1
+2026-05-03 17:09:47,338 [INFO] uvicorn.error: connection open
+2026-05-03 17:20:05,217 [INFO] uvicorn.error: Started server process [9824]
+2026-05-03 17:20:05,219 [INFO] uvicorn.error: Waiting for application startup.
+2026-05-03 17:20:05,220 [INFO] aggregator: Aggregatore avviato — versione produzione 24h
+2026-05-03 17:20:05,282 [INFO] aggregator.data_fetcher: Scarico Orderbook completo iniziale...
+2026-05-03 17:20:05,307 [INFO] aggregator: Motore di Background avviato
+2026-05-03 17:20:05,340 [INFO] aggregator: Caricate 800 candele dal DB
+2026-05-03 17:20:05,430 [INFO] aggregator: Caricati 17314 trade dal DB
+2026-05-03 17:20:05,435 [INFO] uvicorn.error: Application startup complete.
+2026-05-03 17:20:05,441 [INFO] uvicorn.error: Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+2026-05-03 17:20:08,577 [INFO] aggregator: Caricati 401 bucket heatmap 1m dal DB
+2026-05-03 17:20:10,357 [INFO] aggregator: Caricati 186 bucket heatmap 5m dal DB
+2026-05-03 17:20:11,438 [INFO] uvicorn.error: 127.0.0.1:51426 - "WebSocket /ws" [accepted]
+2026-05-03 17:20:11,438 [INFO] aggregator: Client WS connesso. Totale: 1
+2026-05-03 17:20:11,457 [INFO] aggregator: Caricati 87 bucket heatmap 15m dal DB
+2026-05-03 17:20:11,461 [INFO] uvicorn.error: connection open
+2026-05-03 17:20:12,131 [INFO] aggregator: Caricati 22 bucket heatmap 1h dal DB
+2026-05-03 17:20:12,229 [INFO] aggregator: Caricati 6 bucket heatmap 4h dal DB
+2026-05-03 17:20:12,270 [INFO] aggregator: Caricati 4 bucket heatmap 1d dal DB
+2026-05-03 17:23:05,759 [INFO] uvicorn.error: Started server process [20432]
+2026-05-03 17:23:05,760 [INFO] uvicorn.error: Waiting for application startup.
+2026-05-03 17:23:05,761 [INFO] aggregator: Aggregatore avviato — versione produzione 24h
+2026-05-03 17:23:05,814 [INFO] aggregator.data_fetcher: Scarico Orderbook completo iniziale...
+2026-05-03 17:23:05,835 [INFO] aggregator: Motore di Background avviato
+2026-05-03 17:23:05,864 [INFO] aggregator: Caricate 800 candele dal DB
+2026-05-03 17:23:05,925 [INFO] aggregator: Caricati 18545 trade dal DB
+2026-05-03 17:23:05,930 [INFO] uvicorn.error: Application startup complete.
+2026-05-03 17:23:05,935 [INFO] uvicorn.error: Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+2026-05-03 17:23:07,352 [INFO] uvicorn.error: 127.0.0.1:53995 - "WebSocket /ws" [accepted]
+2026-05-03 17:23:07,382 [INFO] aggregator: Client WS connesso. Totale: 1
+2026-05-03 17:23:07,469 [INFO] uvicorn.error: connection open
+2026-05-03 17:23:08,821 [INFO] aggregator: Caricati 433 bucket heatmap 1m dal DB
+2026-05-03 17:23:11,751 [INFO] aggregator: Snapshot bin 5m: caricati 199 bucket dal DB
+2026-05-03 17:23:12,436 [INFO] aggregator: Caricati 199 bucket heatmap 5m dal DB
+2026-05-03 17:23:13,065 [INFO] aggregator: Caricati 94 bucket heatmap 15m dal DB
+2026-05-03 17:23:13,557 [INFO] aggregator: Caricati 24 bucket heatmap 1h dal DB
+2026-05-03 17:23:13,649 [INFO] aggregator: Caricati 6 bucket heatmap 4h dal DB
+2026-05-03 17:23:13,651 [INFO] aggregator: Client WS disconnesso. Rimasti: 0
+2026-05-03 17:23:13,653 [INFO] uvicorn.error: connection closed
+2026-05-03 17:23:13,691 [INFO] aggregator: Caricati 4 bucket heatmap 1d dal DB
+2026-05-03 17:23:14,154 [INFO] uvicorn.error: 127.0.0.1:49249 - "WebSocket /ws" [accepted]
+2026-05-03 17:23:14,155 [INFO] aggregator: Client WS connesso. Totale: 1
+2026-05-03 17:23:14,158 [INFO] uvicorn.error: connection open
+2026-05-03 17:35:21,798 [INFO] uvicorn.error: Started server process [2124]
+2026-05-03 17:35:21,799 [INFO] uvicorn.error: Waiting for application startup.
+2026-05-03 17:35:21,800 [INFO] aggregator: Aggregatore avviato — versione produzione 24h
+2026-05-03 17:35:21,860 [INFO] aggregator.data_fetcher: Scarico Orderbook completo iniziale...
+2026-05-03 17:35:21,886 [INFO] aggregator: Motore di Background avviato
+2026-05-03 17:35:21,934 [INFO] aggregator: Caricate 800 candele dal DB
+2026-05-03 17:35:22,072 [INFO] aggregator: Caricati 24689 trade dal DB
+2026-05-03 17:35:22,081 [INFO] uvicorn.error: Application startup complete.
+2026-05-03 17:35:22,090 [INFO] uvicorn.error: Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+2026-05-03 17:35:22,190 [INFO] uvicorn.error: 127.0.0.1:57181 - "WebSocket /ws" [accepted]
+2026-05-03 17:35:22,192 [INFO] aggregator: Client WS connesso. Totale: 1
+2026-05-03 17:35:22,196 [INFO] uvicorn.error: connection open
+2026-05-03 17:35:26,573 [INFO] aggregator: Snapshot bin 5m: caricati 268 bucket dal DB
+2026-05-03 17:35:28,962 [INFO] aggregator: Caricati 561 bucket heatmap 1m dal DB
+2026-05-03 17:35:28,968 [INFO] aggregator: Client WS disconnesso. Rimasti: 0
+2026-05-03 17:35:28,970 [INFO] uvicorn.error: connection closed
+2026-05-03 17:35:30,813 [INFO] uvicorn.error: 127.0.0.1:49439 - "WebSocket /ws" [accepted]
+2026-05-03 17:35:30,844 [INFO] aggregator: Client WS connesso. Totale: 1
+2026-05-03 17:35:30,963 [INFO] uvicorn.error: connection open
+2026-05-03 17:35:31,080 [INFO] aggregator: Caricati 268 bucket heatmap 5m dal DB
+2026-05-03 17:35:32,929 [INFO] aggregator: Caricati 129 bucket heatmap 15m dal DB
+2026-05-03 17:35:33,147 [INFO] aggregator: Caricati 31 bucket heatmap 1h dal DB
+2026-05-03 17:35:33,237 [INFO] aggregator: Caricati 7 bucket heatmap 4h dal DB
+2026-05-03 17:35:33,294 [INFO] aggregator: Caricati 5 bucket heatmap 1d dal DB
+2026-05-03 17:41:59,158 [INFO] uvicorn.error: Started server process [20200]
+2026-05-03 17:41:59,160 [INFO] uvicorn.error: Waiting for application startup.
+2026-05-03 17:41:59,161 [INFO] aggregator: Aggregatore avviato — versione produzione 24h
+2026-05-03 17:41:59,236 [INFO] aggregator.data_fetcher: Scarico Orderbook completo iniziale...
+2026-05-03 17:41:59,266 [INFO] aggregator: Motore di Background avviato
+2026-05-03 17:41:59,311 [INFO] aggregator: Caricate 800 candele dal DB
+2026-05-03 17:41:59,474 [INFO] aggregator: Caricati 28049 trade dal DB
+2026-05-03 17:41:59,486 [INFO] uvicorn.error: Application startup complete.
+2026-05-03 17:41:59,491 [INFO] uvicorn.error: Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+2026-05-03 17:42:02,859 [INFO] uvicorn.error: 127.0.0.1:50212 - "WebSocket /ws" [accepted]
+2026-05-03 17:42:02,888 [INFO] aggregator: Client WS connesso. Totale: 1
+2026-05-03 17:42:03,180 [INFO] uvicorn.error: connection closed
+2026-05-03 17:42:03,211 [WARNING] aggregator: Client WS disconnesso anomalo (code=1006, reason=).
+2026-05-03 17:42:03,259 [INFO] aggregator: Client WS disconnesso. Rimasti: 0
+2026-05-03 17:42:04,358 [INFO] aggregator: Caricati 621 bucket heatmap 1m dal DB
+2026-05-03 17:42:05,388 [INFO] uvicorn.error: 127.0.0.1:63802 - "WebSocket /ws" [accepted]
+2026-05-03 17:42:05,420 [INFO] aggregator: Client WS connesso. Totale: 1
+2026-05-03 17:42:05,790 [INFO] uvicorn.error: connection open
+2026-05-03 17:42:07,827 [INFO] aggregator: Caricati 301 bucket heatmap 5m dal DB
+2026-05-03 17:42:09,071 [INFO] aggregator: Caricati 146 bucket heatmap 15m dal DB
+2026-05-03 17:42:09,396 [INFO] aggregator: Caricati 35 bucket heatmap 1h dal DB
+2026-05-03 17:42:09,487 [INFO] aggregator: Caricati 8 bucket heatmap 4h dal DB
+2026-05-03 17:42:09,535 [INFO] aggregator: Caricati 5 bucket heatmap 1d dal DB
+2026-05-03 17:46:38,519 [INFO] aggregator: Client WS disconnesso. Rimasti: 0
+2026-05-03 17:46:38,521 [INFO] uvicorn.error: connection closed
+2026-05-03 17:46:52,861 [INFO] uvicorn.error: Started server process [15520]
+2026-05-03 17:46:52,863 [INFO] uvicorn.error: Waiting for application startup.
+2026-05-03 17:46:52,865 [INFO] aggregator: Aggregatore avviato — versione produzione 24h
+2026-05-03 17:46:52,915 [INFO] aggregator.data_fetcher: Scarico Orderbook completo iniziale...
+2026-05-03 17:46:52,935 [INFO] aggregator: Motore di Background avviato
+2026-05-03 17:46:52,970 [INFO] aggregator: Caricate 800 candele dal DB
+2026-05-03 17:46:53,072 [INFO] aggregator: Caricati 29424 trade dal DB
+2026-05-03 17:46:53,078 [INFO] uvicorn.error: Application startup complete.
+2026-05-03 17:46:53,084 [INFO] uvicorn.error: Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+2026-05-03 17:47:02,916 [INFO] uvicorn.error: Started server process [18608]
+2026-05-03 17:47:02,918 [INFO] uvicorn.error: Waiting for application startup.
+2026-05-03 17:47:02,919 [INFO] aggregator: Aggregatore avviato — versione produzione 24h
+2026-05-03 17:47:03,006 [INFO] aggregator.data_fetcher: Scarico Orderbook completo iniziale...
+2026-05-03 17:47:03,077 [INFO] aggregator: Motore di Background avviato
+2026-05-03 17:47:03,123 [INFO] aggregator: Caricate 800 candele dal DB
+2026-05-03 17:47:03,260 [INFO] aggregator: Caricati 29424 trade dal DB
+2026-05-03 17:47:03,267 [INFO] uvicorn.error: Application startup complete.
+2026-05-03 17:47:03,273 [INFO] uvicorn.error: Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+2026-05-03 17:47:08,557 [INFO] aggregator: Caricati 666 bucket heatmap 1m dal DB
+2026-05-03 17:47:11,308 [INFO] aggregator: Caricati 326 bucket heatmap 5m dal DB
+2026-05-03 17:47:11,372 [INFO] uvicorn.error: 127.0.0.1:50060 - "WebSocket /ws" [accepted]
+2026-05-03 17:47:11,373 [INFO] aggregator: Client WS connesso. Totale: 1
+2026-05-03 17:47:11,378 [INFO] uvicorn.error: connection open
+2026-05-03 17:47:13,671 [INFO] aggregator: Caricati 159 bucket heatmap 15m dal DB
+2026-05-03 17:47:14,257 [INFO] aggregator: Caricati 38 bucket heatmap 1h dal DB
+2026-05-03 17:47:14,351 [INFO] aggregator: Caricati 9 bucket heatmap 4h dal DB
+2026-05-03 17:47:14,409 [INFO] aggregator: Caricati 6 bucket heatmap 1d dal DB
+2026-05-03 17:49:03,277 [INFO] aggregator: Client WS disconnesso. Rimasti: 0
+2026-05-03 17:49:03,326 [INFO] uvicorn.error: connection closed
+2026-05-03 17:52:29,591 [INFO] uvicorn.error: Started server process [14944]
+2026-05-03 17:52:29,592 [INFO] uvicorn.error: Waiting for application startup.
+2026-05-03 17:52:29,593 [INFO] aggregator: Aggregatore avviato — versione produzione 24h
+2026-05-03 17:52:29,644 [INFO] aggregator.data_fetcher: Scarico Orderbook completo iniziale...
+2026-05-03 17:52:29,669 [INFO] aggregator: Motore di Background avviato
+2026-05-03 17:52:29,710 [INFO] aggregator: Caricate 800 candele dal DB
+2026-05-03 17:52:29,851 [INFO] aggregator: Caricati 30000 trade dal DB
+2026-05-03 17:52:29,858 [INFO] uvicorn.error: Application startup complete.
+2026-05-03 17:52:29,864 [INFO] uvicorn.error: Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+2026-05-03 17:52:35,285 [INFO] aggregator: Caricati 683 bucket heatmap 1m dal DB
+2026-05-03 17:52:38,614 [INFO] aggregator: Caricati 336 bucket heatmap 5m dal DB
+2026-05-03 17:52:38,650 [INFO] uvicorn.error: 127.0.0.1:61117 - "WebSocket /ws" [accepted]
+2026-05-03 17:52:38,652 [INFO] aggregator: Client WS connesso. Totale: 1
+2026-05-03 17:52:38,656 [INFO] uvicorn.error: connection open
+2026-05-03 17:52:41,638 [INFO] aggregator: Caricati 165 bucket heatmap 15m dal DB
+2026-05-03 17:52:41,971 [INFO] aggregator: Caricati 40 bucket heatmap 1h dal DB
+2026-05-03 17:52:42,048 [INFO] aggregator: Caricati 9 bucket heatmap 4h dal DB
+2026-05-03 17:52:42,114 [INFO] aggregator: Caricati 6 bucket heatmap 1d dal DB
+2026-05-03 17:56:34,318 [INFO] uvicorn.error: Started server process [16632]
+2026-05-03 17:56:34,319 [INFO] uvicorn.error: Waiting for application startup.
+2026-05-03 17:56:34,320 [INFO] aggregator: Aggregatore avviato — versione produzione 24h
+2026-05-03 17:56:34,381 [INFO] aggregator.data_fetcher: Scarico Orderbook completo iniziale...
+2026-05-03 17:56:34,410 [INFO] aggregator: Motore di Background avviato
+2026-05-03 17:56:34,458 [INFO] aggregator: Caricate 800 candele dal DB
+2026-05-03 17:56:34,588 [INFO] aggregator: Caricati 30000 trade dal DB
+2026-05-03 17:56:34,594 [INFO] uvicorn.error: Application startup complete.
+2026-05-03 17:56:34,599 [INFO] uvicorn.error: Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+2026-05-03 17:56:37,720 [INFO] uvicorn.error: 127.0.0.1:53663 - "WebSocket /ws" [accepted]
+2026-05-03 17:56:37,744 [INFO] aggregator: Client WS connesso. Totale: 1
+2026-05-03 17:56:37,924 [INFO] uvicorn.error: connection open
+2026-05-03 17:56:40,056 [INFO] aggregator: Caricati 718 bucket heatmap 1m dal DB
+2026-05-03 17:56:40,093 [INFO] aggregator: Client WS disconnesso. Rimasti: 0
+2026-05-03 17:56:40,102 [INFO] uvicorn.error: connection closed
+2026-05-03 17:56:45,352 [INFO] aggregator: Caricati 355 bucket heatmap 5m dal DB
+2026-05-03 17:56:45,362 [INFO] aggregator: Snapshot bin 5m: caricati 355 bucket dal DB
+2026-05-03 17:56:46,345 [INFO] uvicorn.error: 127.0.0.1:58923 - "WebSocket /ws" [accepted]
+2026-05-03 17:56:46,346 [INFO] aggregator: Client WS connesso. Totale: 1
+2026-05-03 17:56:46,354 [INFO] uvicorn.error: connection open
+2026-05-03 17:56:49,232 [INFO] aggregator: Caricati 175 bucket heatmap 15m dal DB
+2026-05-03 17:56:49,597 [INFO] aggregator: Caricati 43 bucket heatmap 1h dal DB
+2026-05-03 17:56:49,675 [INFO] aggregator: Caricati 10 bucket heatmap 4h dal DB
+2026-05-03 17:56:49,740 [INFO] aggregator: Caricati 6 bucket heatmap 1d dal DB
+2026-05-03 17:59:10,231 [INFO] uvicorn.error: Started server process [18140]
+2026-05-03 17:59:10,232 [INFO] uvicorn.error: Waiting for application startup.
+2026-05-03 17:59:10,233 [INFO] aggregator: Aggregatore avviato — versione produzione 24h
+2026-05-03 17:59:10,299 [INFO] aggregator.data_fetcher: Scarico Orderbook completo iniziale...
+2026-05-03 17:59:10,325 [INFO] aggregator: Motore di Background avviato
+2026-05-03 17:59:10,366 [INFO] aggregator: Caricate 800 candele dal DB
+2026-05-03 17:59:10,508 [INFO] aggregator: Caricati 30000 trade dal DB
+2026-05-03 17:59:10,524 [INFO] uvicorn.error: Application startup complete.
+2026-05-03 17:59:10,530 [INFO] uvicorn.error: Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+2026-05-03 17:59:10,574 [INFO] uvicorn.error: 127.0.0.1:52823 - "WebSocket /ws" [accepted]
+2026-05-03 17:59:10,575 [INFO] aggregator: Client WS connesso. Totale: 1
+2026-05-03 17:59:10,577 [INFO] uvicorn.error: connection open
+2026-05-03 17:59:12,956 [INFO] aggregator: Snapshot bin 5m: caricati 365 bucket dal DB
+2026-05-03 17:59:19,232 [INFO] aggregator: Caricati 736 bucket heatmap 1m dal DB
+2026-05-03 17:59:21,660 [INFO] aggregator: Caricati 365 bucket heatmap 5m dal DB
+2026-05-03 17:59:23,280 [INFO] aggregator: Caricati 181 bucket heatmap 15m dal DB
+2026-05-03 17:59:23,678 [INFO] aggregator: Caricati 45 bucket heatmap 1h dal DB
+2026-05-03 17:59:23,797 [INFO] aggregator: Caricati 10 bucket heatmap 4h dal DB
+2026-05-03 17:59:23,876 [INFO] aggregator: Caricati 6 bucket heatmap 1d dal DB
+2026-05-03 18:11:06,207 [INFO] aggregator: Client WS disconnesso. Rimasti: 0
+2026-05-03 18:11:06,209 [INFO] uvicorn.error: connection closed
+2026-05-03 19:40:49,290 [INFO] uvicorn.error: Started server process [12464]
+2026-05-03 19:40:49,291 [INFO] uvicorn.error: Waiting for application startup.
+2026-05-03 19:40:49,293 [INFO] aggregator: Aggregatore avviato — versione produzione 24h
+2026-05-03 19:40:49,360 [INFO] aggregator.data_fetcher: Scarico Orderbook completo iniziale...
+2026-05-03 19:40:49,380 [INFO] aggregator: Motore di Background avviato
+2026-05-03 19:40:49,410 [INFO] aggregator: Caricate 800 candele dal DB
+2026-05-03 19:40:49,678 [INFO] aggregator: Caricati 39152 trade dal DB
+2026-05-03 19:40:49,685 [INFO] uvicorn.error: Application startup complete.
+2026-05-03 19:40:49,689 [INFO] uvicorn.error: Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+2026-05-03 19:40:57,938 [INFO] aggregator: Caricati 888 bucket heatmap 1m dal DB
+2026-05-03 19:41:02,372 [INFO] aggregator: Caricati 446 bucket heatmap 5m dal DB
+2026-05-03 19:41:03,284 [INFO] uvicorn.error: 127.0.0.1:53647 - "WebSocket /ws" [accepted]
+2026-05-03 19:41:03,330 [INFO] aggregator: Client WS connesso. Totale: 1
+2026-05-03 19:41:05,999 [INFO] aggregator: Caricati 222 bucket heatmap 15m dal DB
+2026-05-03 19:41:06,537 [INFO] aggregator: Caricati 53 bucket heatmap 1h dal DB
+2026-05-03 19:41:06,668 [INFO] aggregator: Caricati 12 bucket heatmap 4h dal DB
+2026-05-03 19:41:06,770 [INFO] aggregator: Caricati 7 bucket heatmap 1d dal DB
+2026-05-03 19:45:19,460 [INFO] aggregator: Pruning DB: rimossi 1260 trade più vecchi di 6.0gg
+2026-05-03 19:46:21,050 [INFO] uvicorn.error: Started server process [11276]
+2026-05-03 19:46:21,054 [INFO] uvicorn.error: Waiting for application startup.
+2026-05-03 19:46:21,058 [INFO] aggregator: Aggregatore avviato — versione produzione 24h
+2026-05-03 19:46:21,114 [INFO] aggregator.data_fetcher: Scarico Orderbook completo iniziale...
+2026-05-03 19:46:21,142 [INFO] aggregator: Motore di Background avviato
+2026-05-03 19:46:21,180 [INFO] aggregator: Caricate 800 candele dal DB
+2026-05-03 19:46:21,345 [INFO] aggregator: Caricati 39683 trade dal DB
+2026-05-03 19:46:21,353 [INFO] uvicorn.error: Application startup complete.
+2026-05-03 19:46:21,358 [INFO] uvicorn.error: Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+2026-05-03 19:46:25,538 [INFO] uvicorn.error: 127.0.0.1:50241 - "WebSocket /ws" [accepted]
+2026-05-03 19:46:25,573 [INFO] aggregator: Client WS connesso. Totale: 1
+2026-05-03 19:46:28,498 [INFO] aggregator: Caricati 940 bucket heatmap 1m dal DB
+2026-05-03 19:46:34,752 [INFO] aggregator: Client WS disconnesso. Rimasti: 0
+2026-05-03 19:46:34,755 [INFO] aggregator: Snapshot bin 5m: caricati 476 bucket dal DB
+2026-05-03 19:46:35,818 [INFO] aggregator: Caricati 476 bucket heatmap 5m dal DB
+2026-05-03 19:46:37,371 [INFO] uvicorn.error: 127.0.0.1:50677 - "WebSocket /ws" [accepted]
+2026-05-03 19:46:37,418 [INFO] aggregator: Client WS connesso. Totale: 1
+2026-05-03 19:46:39,427 [INFO] aggregator: Caricati 237 bucket heatmap 15m dal DB
+2026-05-03 19:46:40,086 [INFO] aggregator: Caricati 98 bucket heatmap 1h dal DB
+2026-05-03 19:46:40,260 [INFO] aggregator: Caricati 20 bucket heatmap 4h dal DB
+2026-05-03 19:46:40,347 [INFO] aggregator: Caricati 8 bucket heatmap 1d dal DB
+2026-05-03 19:48:21,571 [INFO] aggregator: Client WS disconnesso. Rimasti: 0
+2026-05-03 23:03:29,146 [INFO] uvicorn.error: Started server process [18904]
+2026-05-03 23:03:29,149 [INFO] uvicorn.error: Waiting for application startup.
+2026-05-03 23:03:29,153 [INFO] aggregator: Aggregatore avviato — versione produzione 24h
+2026-05-03 23:03:29,326 [INFO] aggregator.data_fetcher: Scarico Orderbook completo iniziale...
+2026-05-03 23:03:29,531 [INFO] aggregator: Motore di Background avviato
+2026-05-03 23:03:29,641 [INFO] aggregator: Caricate 800 candele dal DB
+2026-05-03 23:03:30,345 [INFO] aggregator: Caricati 40000 trade dal DB
+2026-05-03 23:03:30,361 [INFO] uvicorn.error: Application startup complete.
+2026-05-03 23:03:30,375 [INFO] uvicorn.error: Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+2026-05-03 23:03:42,800 [INFO] aggregator: Caricati 957 bucket heatmap 1m dal DB
+2026-05-03 23:03:45,513 [INFO] uvicorn.error: 127.0.0.1:53409 - "WebSocket /ws" [accepted]
+2026-05-03 23:03:45,543 [INFO] aggregator: Client WS connesso. Totale: 1
+2026-05-03 23:03:49,117 [INFO] aggregator: Caricati 485 bucket heatmap 5m dal DB
+2026-05-03 23:03:51,042 [INFO] aggregator: Caricati 242 bucket heatmap 15m dal DB
+2026-05-03 23:03:51,665 [INFO] aggregator: Caricati 100 bucket heatmap 1h dal DB
+2026-05-03 23:03:51,864 [INFO] aggregator: Caricati 21 bucket heatmap 4h dal DB
+2026-05-03 23:03:52,311 [INFO] aggregator: Caricati 8 bucket heatmap 1d dal DB
+2026-05-03 23:06:00,660 [INFO] aggregator: Client WS disconnesso. Rimasti: 0
+2026-05-04 09:43:48,547 [INFO] uvicorn.error: Started server process [9116]
+2026-05-04 09:43:48,551 [INFO] uvicorn.error: Waiting for application startup.
+2026-05-04 09:43:48,555 [INFO] aggregator: Aggregatore avviato — versione produzione 24h
+2026-05-04 09:43:48,646 [INFO] aggregator.data_fetcher: Scarico Orderbook completo iniziale...
+2026-05-04 09:43:48,700 [INFO] aggregator: Motore di Background avviato
+2026-05-04 09:43:48,749 [INFO] aggregator: Caricate 800 candele dal DB
+2026-05-04 09:43:49,101 [INFO] aggregator: Caricati 41613 trade dal DB
+2026-05-04 09:43:49,107 [INFO] uvicorn.error: Application startup complete.
+2026-05-04 09:43:49,121 [INFO] uvicorn.error: Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+2026-05-04 09:43:49,558 [INFO] aggregator: Caricati 18 bucket heatmap 1m dal DB
+2026-05-04 09:43:50,220 [INFO] uvicorn.error: 127.0.0.1:61750 - "WebSocket /ws" [accepted]
+2026-05-04 09:43:50,222 [INFO] aggregator: Client WS connesso. Totale: 1
+2026-05-04 09:43:51,329 [INFO] aggregator: Caricati 10 bucket heatmap 5m dal DB
+2026-05-04 09:43:52,997 [INFO] aggregator: Caricati 6 bucket heatmap 15m dal DB
+2026-05-04 09:43:54,573 [INFO] aggregator: Caricati 3 bucket heatmap 1h dal DB
+2026-05-04 09:43:56,123 [INFO] aggregator: Caricati 1 bucket heatmap 4h dal DB
+2026-05-04 09:43:57,671 [INFO] aggregator: Caricati 1 bucket heatmap 1d dal DB
+2026-05-04 09:46:59,872 [INFO] aggregator: Pruning DB: rimossi 41613 trade più vecchi di 6.0gg
+2026-05-04 09:53:30,182 [INFO] uvicorn.error: Started server process [7744]
+2026-05-04 09:53:30,186 [INFO] uvicorn.error: Waiting for application startup.
+2026-05-04 09:53:30,187 [INFO] aggregator: Aggregatore avviato — versione produzione 24h
+2026-05-04 09:53:30,264 [INFO] aggregator.data_fetcher: Scarico Orderbook completo iniziale...
+2026-05-04 09:53:30,378 [INFO] aggregator: Motore di Background avviato
+2026-05-04 09:53:30,426 [INFO] aggregator: Caricate 800 candele dal DB
+2026-05-04 09:53:30,483 [INFO] aggregator: Caricati 10821 trade dal DB
+2026-05-04 09:53:30,486 [INFO] uvicorn.error: Application startup complete.
+2026-05-04 09:53:30,501 [INFO] uvicorn.error: Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+2026-05-04 09:53:32,510 [INFO] aggregator: Caricati 133 bucket heatmap 1m dal DB
+2026-05-04 09:53:32,527 [INFO] uvicorn.error: 127.0.0.1:55099 - "WebSocket /ws" [accepted]
+2026-05-04 09:53:32,533 [INFO] aggregator: Client WS connesso. Totale: 1
+2026-05-04 09:53:32,611 [INFO] aggregator: Client WS disconnesso. Rimasti: 0
+2026-05-04 09:53:33,479 [INFO] uvicorn.error: 127.0.0.1:56613 - "WebSocket /ws" [accepted]
+2026-05-04 09:53:33,484 [INFO] aggregator: Client WS connesso. Totale: 1
+2026-05-04 09:53:35,224 [INFO] aggregator: Caricati 68 bucket heatmap 5m dal DB
+2026-05-04 09:53:37,160 [INFO] aggregator: Caricati 35 bucket heatmap 15m dal DB
+2026-05-04 09:53:39,075 [INFO] aggregator: Caricati 11 bucket heatmap 1h dal DB
+2026-05-04 09:53:40,663 [INFO] aggregator: Caricati 4 bucket heatmap 4h dal DB
+2026-05-04 09:53:42,215 [INFO] aggregator: Caricati 3 bucket heatmap 1d dal DB
+2026-05-04 09:59:38,196 [INFO] uvicorn.error: Started server process [2316]
+2026-05-04 09:59:38,198 [INFO] uvicorn.error: Waiting for application startup.
+2026-05-04 09:59:38,199 [INFO] aggregator: Aggregatore avviato — versione produzione 24h
+2026-05-04 09:59:38,254 [INFO] aggregator.data_fetcher: Scarico Orderbook completo iniziale...
+2026-05-04 09:59:38,288 [INFO] aggregator: Motore di Background avviato
+2026-05-04 09:59:38,325 [INFO] aggregator: Caricate 800 candele dal DB
+2026-05-04 09:59:38,373 [INFO] aggregator: Caricati 15984 trade dal DB
+2026-05-04 09:59:38,376 [INFO] uvicorn.error: Application startup complete.
+2026-05-04 09:59:38,386 [INFO] uvicorn.error: Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+2026-05-04 09:59:39,763 [INFO] uvicorn.error: 127.0.0.1:59620 - "WebSocket /ws" [accepted]
+2026-05-04 09:59:39,805 [INFO] aggregator: Client WS connesso. Totale: 1
+2026-05-04 09:59:40,070 [INFO] aggregator: Caricati 205 bucket heatmap 1m dal DB
+2026-05-04 09:59:40,228 [INFO] aggregator: Snapshot bin 1h: caricati 16 bucket dal DB
+2026-05-04 09:59:42,450 [INFO] aggregator: Caricati 104 bucket heatmap 5m dal DB
+2026-05-04 09:59:44,540 [INFO] aggregator: Caricati 54 bucket heatmap 15m dal DB
+2026-05-04 09:59:46,209 [INFO] aggregator: Caricati 16 bucket heatmap 1h dal DB
+2026-05-04 09:59:47,786 [INFO] aggregator: Caricati 6 bucket heatmap 4h dal DB
+2026-05-04 09:59:49,378 [INFO] aggregator: Caricati 4 bucket heatmap 1d dal DB
+2026-05-04 09:59:56,787 [INFO] aggregator: Client WS disconnesso. Rimasti: 0
+2026-05-04 09:59:57,368 [INFO] uvicorn.error: 127.0.0.1:50060 - "WebSocket /ws" [accepted]
+2026-05-04 09:59:57,369 [INFO] aggregator: Client WS connesso. Totale: 1
+2026-05-04 10:00:45,380 [INFO] uvicorn.error: Started server process [17816]
+2026-05-04 10:00:45,382 [INFO] uvicorn.error: Waiting for application startup.
+2026-05-04 10:00:45,383 [INFO] aggregator: Aggregatore avviato — versione produzione 24h
+2026-05-04 10:00:45,433 [INFO] aggregator.data_fetcher: Scarico Orderbook completo iniziale...
+2026-05-04 10:00:45,483 [INFO] aggregator: Motore di Background avviato
+2026-05-04 10:00:45,521 [INFO] aggregator: Caricate 800 candele dal DB
+2026-05-04 10:00:45,611 [INFO] aggregator: Caricati 17971 trade dal DB
+2026-05-04 10:00:45,615 [INFO] uvicorn.error: Application startup complete.
+2026-05-04 10:00:45,628 [INFO] uvicorn.error: Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+2026-05-04 10:00:46,996 [INFO] uvicorn.error: 127.0.0.1:59612 - "WebSocket /ws" [accepted]
+2026-05-04 10:00:47,058 [INFO] aggregator: Client WS connesso. Totale: 1
+2026-05-04 10:00:47,547 [INFO] aggregator: Caricati 214 bucket heatmap 1m dal DB
+2026-05-04 10:00:48,551 [INFO] aggregator: Snapshot bin 5m: caricati 109 bucket dal DB
+2026-05-04 10:00:50,183 [INFO] aggregator: Caricati 109 bucket heatmap 5m dal DB
+2026-05-04 10:00:50,913 [INFO] aggregator: Client WS disconnesso. Rimasti: 0
+2026-05-04 10:00:51,454 [INFO] uvicorn.error: 127.0.0.1:63780 - "WebSocket /ws" [accepted]
+2026-05-04 10:00:51,459 [INFO] aggregator: Client WS connesso. Totale: 1
+2026-05-04 10:00:52,717 [INFO] aggregator: Caricati 56 bucket heatmap 15m dal DB
+2026-05-04 10:00:54,394 [INFO] aggregator: Caricati 17 bucket heatmap 1h dal DB
+2026-05-04 10:00:55,996 [INFO] aggregator: Caricati 7 bucket heatmap 4h dal DB
+2026-05-04 10:00:57,547 [INFO] aggregator: Caricati 4 bucket heatmap 1d dal DB
+2026-05-04 10:02:22,326 [INFO] uvicorn.error: Started server process [17372]
+2026-05-04 10:02:22,328 [INFO] uvicorn.error: Waiting for application startup.
+2026-05-04 10:02:22,329 [INFO] aggregator: Aggregatore avviato — versione produzione 24h
+2026-05-04 10:02:22,385 [INFO] aggregator.data_fetcher: Scarico Orderbook completo iniziale...
+2026-05-04 10:02:22,442 [INFO] aggregator: Motore di Background avviato
+2026-05-04 10:02:22,486 [INFO] aggregator: Caricate 800 candele dal DB
+2026-05-04 10:02:22,583 [INFO] aggregator: Caricati 21544 trade dal DB
+2026-05-04 10:02:22,586 [INFO] uvicorn.error: Application startup complete.
+2026-05-04 10:02:22,599 [INFO] uvicorn.error: Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+2026-05-04 10:02:24,419 [INFO] aggregator: Caricati 230 bucket heatmap 1m dal DB
+2026-05-04 10:02:25,221 [INFO] uvicorn.error: 127.0.0.1:63102 - "WebSocket /ws" [accepted]
+2026-05-04 10:02:25,223 [INFO] aggregator: Client WS connesso. Totale: 1
+2026-05-04 10:02:32,526 [INFO] uvicorn.error: Started server process [8836]
+2026-05-04 10:02:32,527 [INFO] uvicorn.error: Waiting for application startup.
+2026-05-04 10:02:32,529 [INFO] aggregator: Aggregatore avviato — versione produzione 24h
+2026-05-04 10:02:32,597 [INFO] aggregator.data_fetcher: Scarico Orderbook completo iniziale...
+2026-05-04 10:02:32,662 [INFO] aggregator: Motore di Background avviato
+2026-05-04 10:02:32,702 [INFO] aggregator: Caricate 800 candele dal DB
+2026-05-04 10:02:32,876 [INFO] aggregator: Caricati 21553 trade dal DB
+2026-05-04 10:02:32,879 [INFO] uvicorn.error: Application startup complete.
+2026-05-04 10:02:32,891 [INFO] uvicorn.error: Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+2026-05-04 10:02:35,124 [INFO] aggregator: Caricati 230 bucket heatmap 1m dal DB
+2026-05-04 10:02:35,146 [INFO] uvicorn.error: 127.0.0.1:56674 - "WebSocket /ws" [accepted]
+2026-05-04 10:02:35,148 [INFO] aggregator: Client WS connesso. Totale: 1
+2026-05-04 10:02:35,167 [INFO] aggregator: Client WS disconnesso. Rimasti: 0
+2026-05-04 10:02:35,704 [INFO] uvicorn.error: 127.0.0.1:56438 - "WebSocket /ws" [accepted]
+2026-05-04 10:02:35,709 [INFO] aggregator: Client WS connesso. Totale: 1
+2026-05-04 10:02:37,980 [INFO] aggregator: Caricati 118 bucket heatmap 5m dal DB
+2026-05-04 10:02:40,194 [INFO] aggregator: Caricati 61 bucket heatmap 15m dal DB
+2026-05-04 10:02:41,884 [INFO] aggregator: Caricati 18 bucket heatmap 1h dal DB
+2026-05-04 10:02:43,480 [INFO] aggregator: Caricati 7 bucket heatmap 4h dal DB
+2026-05-04 10:02:45,129 [INFO] aggregator: Caricati 4 bucket heatmap 1d dal DB
+2026-05-04 10:05:58,596 [INFO] uvicorn.error: Started server process [14044]
+2026-05-04 10:05:58,598 [INFO] uvicorn.error: Waiting for application startup.
+2026-05-04 10:05:58,600 [INFO] aggregator: Aggregatore avviato — versione produzione 24h
+2026-05-04 10:05:58,659 [INFO] aggregator.data_fetcher: Scarico Orderbook completo iniziale...
+2026-05-04 10:05:58,719 [INFO] aggregator: Motore di Background avviato
+2026-05-04 10:05:58,756 [INFO] aggregator: Caricate 800 candele dal DB
+2026-05-04 10:05:58,889 [INFO] aggregator: Caricati 26009 trade dal DB
+2026-05-04 10:05:58,894 [INFO] uvicorn.error: Application startup complete.
+2026-05-04 10:05:58,909 [INFO] uvicorn.error: Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+2026-05-04 10:06:01,321 [INFO] aggregator: Caricati 263 bucket heatmap 1m dal DB
+2026-05-04 10:06:01,331 [INFO] uvicorn.error: 127.0.0.1:49921 - "WebSocket /ws" [accepted]
+2026-05-04 10:06:01,335 [INFO] aggregator: Client WS connesso. Totale: 1
+2026-05-04 10:06:01,356 [INFO] aggregator: Client WS disconnesso. Rimasti: 0
+2026-05-04 10:06:01,960 [INFO] uvicorn.error: 127.0.0.1:64458 - "WebSocket /ws" [accepted]
+2026-05-04 10:06:01,962 [INFO] aggregator: Client WS connesso. Totale: 1
+2026-05-04 10:06:04,371 [INFO] aggregator: Caricati 135 bucket heatmap 5m dal DB
+2026-05-04 10:06:06,418 [INFO] aggregator: Caricati 70 bucket heatmap 15m dal DB
+2026-05-04 10:06:08,281 [INFO] aggregator: Caricati 20 bucket heatmap 1h dal DB
+2026-05-04 10:06:09,859 [INFO] aggregator: Caricati 8 bucket heatmap 4h dal DB
+2026-05-04 10:06:11,446 [INFO] aggregator: Caricati 4 bucket heatmap 1d dal DB
+2026-05-04 10:10:02,943 [INFO] uvicorn.error: Started server process [3168]
+2026-05-04 10:10:02,944 [INFO] uvicorn.error: Waiting for application startup.
+2026-05-04 10:10:02,945 [INFO] aggregator: Aggregatore avviato — versione produzione 24h
+2026-05-04 10:10:03,001 [INFO] aggregator.data_fetcher: Scarico Orderbook completo iniziale...
+2026-05-04 10:10:03,053 [INFO] aggregator: Motore di Background avviato
+2026-05-04 10:10:03,088 [INFO] aggregator: Caricate 800 candele dal DB
+2026-05-04 10:10:03,200 [INFO] aggregator: Caricati 32204 trade dal DB
+2026-05-04 10:10:03,205 [INFO] uvicorn.error: Application startup complete.
+2026-05-04 10:10:03,234 [INFO] uvicorn.error: Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+2026-05-04 10:10:05,922 [INFO] aggregator: Caricati 305 bucket heatmap 1m dal DB
+2026-05-04 10:10:06,589 [INFO] uvicorn.error: 127.0.0.1:59458 - "WebSocket /ws" [accepted]
+2026-05-04 10:10:06,591 [INFO] aggregator: Client WS connesso. Totale: 1
+2026-05-04 10:10:08,873 [INFO] aggregator: Caricati 157 bucket heatmap 5m dal DB
+2026-05-04 10:10:11,289 [INFO] aggregator: Caricati 81 bucket heatmap 15m dal DB
+2026-05-04 10:10:13,098 [INFO] aggregator: Caricati 24 bucket heatmap 1h dal DB
+2026-05-04 10:10:14,680 [INFO] aggregator: Caricati 9 bucket heatmap 4h dal DB
+2026-05-04 10:10:16,263 [INFO] aggregator: Caricati 5 bucket heatmap 1d dal DB
+2026-05-04 10:20:02,095 [INFO] uvicorn.error: Started server process [2632]
+2026-05-04 10:20:02,096 [INFO] uvicorn.error: Waiting for application startup.
+2026-05-04 10:20:02,098 [INFO] aggregator: Aggregatore avviato — versione produzione 24h
+2026-05-04 10:20:02,175 [INFO] aggregator.data_fetcher: Scarico Orderbook completo iniziale...
+2026-05-04 10:20:02,221 [INFO] aggregator: Motore di Background avviato
+2026-05-04 10:20:02,259 [INFO] aggregator: Caricate 800 candele dal DB
+2026-05-04 10:20:02,482 [INFO] aggregator: Caricati 44760 trade dal DB
+2026-05-04 10:20:02,488 [INFO] uvicorn.error: Application startup complete.
+2026-05-04 10:20:02,505 [INFO] uvicorn.error: Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+2026-05-04 10:20:06,697 [INFO] aggregator: Caricati 420 bucket heatmap 1m dal DB
+2026-05-04 10:20:06,703 [INFO] uvicorn.error: 127.0.0.1:59038 - "WebSocket /ws" [accepted]
+2026-05-04 10:20:06,705 [INFO] aggregator: Client WS connesso. Totale: 1
+2026-05-04 10:20:06,760 [INFO] aggregator: Client WS disconnesso. Rimasti: 0
+2026-05-04 10:20:08,957 [INFO] aggregator: Snapshot bin 5m: caricati 215 bucket dal DB
+2026-05-04 10:20:09,879 [INFO] uvicorn.error: 127.0.0.1:57787 - "WebSocket /ws" [accepted]
+2026-05-04 10:20:09,882 [INFO] aggregator: Client WS connesso. Totale: 1
+2026-05-04 10:20:13,488 [INFO] aggregator: Caricati 215 bucket heatmap 5m dal DB
+2026-05-04 10:20:16,373 [INFO] aggregator: Caricati 110 bucket heatmap 15m dal DB
+2026-05-04 10:20:18,623 [INFO] aggregator: Caricati 31 bucket heatmap 1h dal DB
+2026-05-04 10:20:20,403 [INFO] aggregator: Caricati 12 bucket heatmap 4h dal DB
+2026-05-04 10:20:22,007 [INFO] aggregator: Caricati 6 bucket heatmap 1d dal DB
+2026-05-04 10:23:17,366 [INFO] uvicorn.error: Started server process [22460]
+2026-05-04 10:23:17,368 [INFO] uvicorn.error: Waiting for application startup.
+2026-05-04 10:23:17,369 [INFO] aggregator: Aggregatore avviato — versione produzione 24h
+2026-05-04 10:23:17,427 [INFO] aggregator.data_fetcher: Scarico Orderbook completo iniziale...
+2026-05-04 10:23:17,491 [INFO] aggregator: Motore di Background avviato
+2026-05-04 10:23:17,536 [INFO] aggregator: Caricate 800 candele dal DB
+2026-05-04 10:23:17,726 [INFO] aggregator: Caricati 49036 trade dal DB
+2026-05-04 10:23:17,733 [INFO] uvicorn.error: Application startup complete.
+2026-05-04 10:23:17,749 [INFO] uvicorn.error: Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+2026-05-04 10:23:19,784 [INFO] uvicorn.error: 127.0.0.1:49759 - "WebSocket /ws" [accepted]
+2026-05-04 10:23:19,847 [INFO] aggregator: Client WS connesso. Totale: 1
+2026-05-04 10:23:22,003 [INFO] aggregator: Caricati 448 bucket heatmap 1m dal DB
+2026-05-04 10:23:22,043 [INFO] aggregator: Client WS disconnesso. Rimasti: 0
+2026-05-04 10:23:24,194 [INFO] aggregator: Snapshot bin 5m: caricati 231 bucket dal DB
+2026-05-04 10:23:26,504 [INFO] uvicorn.error: 127.0.0.1:63246 - "WebSocket /ws" [accepted]
+2026-05-04 10:23:26,542 [INFO] aggregator: Client WS connesso. Totale: 1
+2026-05-04 10:23:27,713 [INFO] aggregator: Caricati 231 bucket heatmap 5m dal DB
+2026-05-04 10:23:30,598 [INFO] aggregator: Caricati 118 bucket heatmap 15m dal DB
+2026-05-04 10:23:32,422 [INFO] aggregator: Caricati 33 bucket heatmap 1h dal DB
+2026-05-04 10:23:34,073 [INFO] aggregator: Caricati 13 bucket heatmap 4h dal DB
+2026-05-04 10:23:35,658 [INFO] aggregator: Caricati 6 bucket heatmap 1d dal DB
+2026-05-04 10:27:53,165 [INFO] uvicorn.error: Started server process [18160]
+2026-05-04 10:27:53,166 [INFO] uvicorn.error: Waiting for application startup.
+2026-05-04 10:27:53,167 [INFO] aggregator: Aggregatore avviato — versione produzione 24h
+2026-05-04 10:27:53,234 [INFO] aggregator.data_fetcher: Scarico Orderbook completo iniziale...
+2026-05-04 10:27:53,296 [INFO] aggregator: Motore di Background avviato
+2026-05-04 10:27:53,330 [INFO] aggregator: Caricate 800 candele dal DB
+2026-05-04 10:27:53,532 [INFO] aggregator: Caricati 55550 trade dal DB
+2026-05-04 10:27:53,538 [INFO] uvicorn.error: Application startup complete.
+2026-05-04 10:27:53,553 [INFO] uvicorn.error: Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+2026-05-04 10:27:57,061 [INFO] uvicorn.error: 127.0.0.1:58175 - "WebSocket /ws" [accepted]
+2026-05-04 10:27:57,098 [INFO] aggregator: Client WS connesso. Totale: 1
+2026-05-04 10:27:57,935 [WARNING] aggregator: Client WS disconnesso anomalo (code=1005, reason=).
+2026-05-04 10:27:57,935 [INFO] aggregator: Client WS disconnesso. Rimasti: 0
+2026-05-04 10:27:57,937 [INFO] aggregator: Caricati 494 bucket heatmap 1m dal DB
+2026-05-04 10:27:58,485 [INFO] uvicorn.error: 127.0.0.1:54479 - "WebSocket /ws" [accepted]
+2026-05-04 10:27:58,487 [INFO] aggregator: Client WS connesso. Totale: 1
+2026-05-04 10:28:01,600 [INFO] aggregator: Caricati 257 bucket heatmap 5m dal DB
+2026-05-04 10:28:04,463 [INFO] aggregator: Caricati 132 bucket heatmap 15m dal DB
+2026-05-04 10:28:06,289 [INFO] aggregator: Caricati 37 bucket heatmap 1h dal DB
+2026-05-04 10:28:07,961 [INFO] aggregator: Caricati 15 bucket heatmap 4h dal DB
+2026-05-04 10:28:09,541 [INFO] aggregator: Caricati 7 bucket heatmap 1d dal DB
+2026-05-04 10:29:45,628 [INFO] uvicorn.error: Started server process [16772]
+2026-05-04 10:29:45,629 [INFO] uvicorn.error: Waiting for application startup.
+2026-05-04 10:29:45,630 [INFO] aggregator: Aggregatore avviato — versione produzione 24h
+2026-05-04 10:29:45,694 [INFO] aggregator.data_fetcher: Scarico Orderbook completo iniziale...
+2026-05-04 10:29:45,727 [INFO] aggregator: Motore di Background avviato
+2026-05-04 10:29:45,773 [INFO] aggregator: Caricate 800 candele dal DB
+2026-05-04 10:29:46,055 [INFO] aggregator: Caricati 56852 trade dal DB
+2026-05-04 10:29:46,064 [INFO] uvicorn.error: Application startup complete.
+2026-05-04 10:29:46,084 [INFO] uvicorn.error: Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+2026-05-04 10:29:49,090 [INFO] uvicorn.error: 127.0.0.1:56770 - "WebSocket /ws" [accepted]
+2026-05-04 10:29:49,130 [INFO] aggregator: Client WS connesso. Totale: 1
+2026-05-04 10:29:50,345 [WARNING] aggregator: Client WS disconnesso anomalo (code=1005, reason=).
+2026-05-04 10:29:50,368 [INFO] aggregator: Client WS disconnesso. Rimasti: 0
+2026-05-04 10:29:51,174 [INFO] aggregator: Caricati 514 bucket heatmap 1m dal DB
+2026-05-04 10:29:51,742 [INFO] uvicorn.error: 127.0.0.1:49535 - "WebSocket /ws" [accepted]
+2026-05-04 10:29:51,745 [INFO] aggregator: Client WS connesso. Totale: 1
+2026-05-04 10:29:55,133 [INFO] aggregator: Caricati 267 bucket heatmap 5m dal DB
+2026-05-04 10:30:00,985 [INFO] aggregator: Caricati 138 bucket heatmap 15m dal DB
+2026-05-04 10:30:04,136 [INFO] aggregator: Caricati 38 bucket heatmap 1h dal DB
+2026-05-04 10:30:05,821 [INFO] aggregator: Caricati 15 bucket heatmap 4h dal DB
+2026-05-04 10:30:07,401 [INFO] aggregator: Caricati 7 bucket heatmap 1d dal DB
+2026-05-04 10:45:43,125 [INFO] uvicorn.error: Started server process [7460]
+2026-05-04 10:45:43,127 [INFO] uvicorn.error: Waiting for application startup.
+2026-05-04 10:45:43,128 [INFO] aggregator: Aggregatore avviato — versione produzione 24h
+2026-05-04 10:45:43,213 [INFO] aggregator.data_fetcher: Scarico Orderbook completo iniziale...
+2026-05-04 10:45:43,279 [INFO] aggregator: Motore di Background avviato
+2026-05-04 10:45:43,338 [INFO] aggregator: Caricate 800 candele dal DB
+2026-05-04 10:45:43,730 [INFO] aggregator: Caricati 67225 trade dal DB
+2026-05-04 10:45:43,742 [INFO] uvicorn.error: Application startup complete.
+2026-05-04 10:45:43,763 [INFO] uvicorn.error: Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+2026-05-04 10:45:51,921 [INFO] aggregator: Caricati 680 bucket heatmap 1m dal DB
+2026-05-04 10:45:51,931 [INFO] uvicorn.error: 127.0.0.1:57646 - "WebSocket /ws" [accepted]
+2026-05-04 10:45:51,934 [INFO] aggregator: Client WS connesso. Totale: 1
+2026-05-04 10:45:57,332 [INFO] aggregator: Caricati 358 bucket heatmap 5m dal DB
+2026-05-04 10:46:00,652 [INFO] aggregator: Caricati 184 bucket heatmap 15m dal DB
+2026-05-04 10:46:05,083 [INFO] aggregator: Caricati 50 bucket heatmap 1h dal DB
+2026-05-04 10:46:06,789 [INFO] aggregator: Caricati 20 bucket heatmap 4h dal DB
+2026-05-04 10:46:08,432 [INFO] aggregator: Caricati 9 bucket heatmap 1d dal DB
+2026-05-04 10:47:13,817 [INFO] uvicorn.error: Started server process [16420]
+2026-05-04 10:47:13,818 [INFO] uvicorn.error: Waiting for application startup.
+2026-05-04 10:47:13,820 [INFO] aggregator: Aggregatore avviato — versione produzione 24h
+2026-05-04 10:47:13,883 [INFO] aggregator.data_fetcher: Scarico Orderbook completo iniziale...
+2026-05-04 10:47:13,920 [INFO] aggregator: Motore di Background avviato
+2026-05-04 10:47:13,956 [INFO] aggregator: Caricate 800 candele dal DB
+2026-05-04 10:47:14,276 [INFO] aggregator: Caricati 67769 trade dal DB
+2026-05-04 10:47:14,285 [INFO] uvicorn.error: Application startup complete.
+2026-05-04 10:47:14,302 [INFO] uvicorn.error: Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+2026-05-04 10:47:20,878 [INFO] aggregator: Caricati 692 bucket heatmap 1m dal DB
+2026-05-04 10:47:20,881 [INFO] uvicorn.error: 127.0.0.1:61798 - "WebSocket /ws" [accepted]
+2026-05-04 10:47:20,883 [INFO] aggregator: Client WS connesso. Totale: 1
+2026-05-04 10:47:20,939 [INFO] aggregator: Client WS disconnesso. Rimasti: 0
+2026-05-04 10:47:22,710 [INFO] aggregator: Snapshot bin 15m: caricati 188 bucket dal DB
+2026-05-04 10:47:23,739 [INFO] uvicorn.error: 127.0.0.1:63665 - "WebSocket /ws" [accepted]
+2026-05-04 10:47:23,742 [INFO] aggregator: Client WS connesso. Totale: 1
+2026-05-04 10:47:27,328 [INFO] aggregator: Caricati 365 bucket heatmap 5m dal DB
+2026-05-04 10:47:30,529 [INFO] aggregator: Caricati 188 bucket heatmap 15m dal DB
+2026-05-04 10:47:33,035 [INFO] aggregator: Caricati 52 bucket heatmap 1h dal DB
+2026-05-04 10:47:34,763 [INFO] aggregator: Caricati 21 bucket heatmap 4h dal DB
+2026-05-04 10:47:40,304 [INFO] aggregator: Caricati 9 bucket heatmap 1d dal DB
+2026-05-04 11:06:16,819 [WARNING] aggregator: Client WS disconnesso anomalo (code=1005, reason=).
+2026-05-04 11:06:16,835 [INFO] aggregator: Client WS disconnesso. Rimasti: 0
+2026-05-04 11:22:35,582 [ERROR] aggregator: Engine Loop Error
+Traceback (most recent call last):
+  File "c:\Users\seyni\AppData\Local\Programs\Python\Python313\Lib\site-packages\aiohttp\client_reqrep.py", line 539, in start
+    message, payload = await protocol.read()  # type: ignore[union-attr]
+                       ^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\seyni\AppData\Local\Programs\Python\Python313\Lib\site-packages\aiohttp\streams.py", line 680, in read
+    await self._waiter
+asyncio.exceptions.CancelledError
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "c:\Users\seyni\bitcoin_orderflow_app\production_package\server.py", line 571, in background_engine
+    raw = await data_fetcher.fetch_all_async(http_session, fetch_klines=is_heavy_tick)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\seyni\bitcoin_orderflow_app\production_package\data_fetcher.py", line 322, in fetch_all_async
+    async with session.get(
+               ~~~~~~~~~~~^
+        f"{config.BINANCE_FUTURES_BASE}/klines",
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        params={"symbol": "BTCUSDT", "interval": config.TIMEFRAME, "limit": config.CANDLE_LIMIT}
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ) as r:
+    ^
+  File "c:\Users\seyni\AppData\Local\Programs\Python\Python313\Lib\site-packages\aiohttp\client.py", line 1510, in __aenter__
+    self._resp: _RetType = await self._coro
+                           ^^^^^^^^^^^^^^^^
+  File "c:\Users\seyni\AppData\Local\Programs\Python\Python313\Lib\site-packages\aiohttp\client.py", line 779, in _request
+    resp = await handler(req)
+           ^^^^^^^^^^^^^^^^^^
+  File "c:\Users\seyni\AppData\Local\Programs\Python\Python313\Lib\site-packages\aiohttp\client.py", line 757, in _connect_and_send_request
+    await resp.start(conn)
+  File "c:\Users\seyni\AppData\Local\Programs\Python\Python313\Lib\site-packages\aiohttp\client_reqrep.py", line 534, in start
+    with self._timer:
+         ^^^^^^^^^^^
+  File "c:\Users\seyni\AppData\Local\Programs\Python\Python313\Lib\site-packages\aiohttp\helpers.py", line 713, in __exit__
+    raise asyncio.TimeoutError from exc_val
+TimeoutError
+2026-05-04 11:22:37,898 [ERROR] aggregator: Engine Loop Error
+Traceback (most recent call last):
+  File "c:\Users\seyni\AppData\Local\Programs\Python\Python313\Lib\site-packages\aiohttp\resolver.py", line 117, in resolve
+    resp = await self._resolver.getaddrinfo(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<5 lines>...
+    )
+    ^
+aiodns.error.DNSError: (11, 'Could not contact DNS servers')
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "c:\Users\seyni\AppData\Local\Programs\Python\Python313\Lib\site-packages\aiohttp\connector.py", line 1532, in _create_direct_connection
+    hosts = await self._resolve_host(host, port, traces=traces)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\seyni\AppData\Local\Programs\Python\Python313\Lib\site-packages\aiohttp\connector.py", line 1148, in _resolve_host
+    return await asyncio.shield(resolved_host_task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\seyni\AppData\Local\Programs\Python\Python313\Lib\site-packages\aiohttp\connector.py", line 1179, in _resolve_host_with_throttle
+    addrs = await self._resolver.resolve(host, port, family=self._family)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\seyni\AppData\Local\Programs\Python\Python313\Lib\site-packages\aiohttp\resolver.py", line 126, in resolve
+    raise OSError(None, msg) from exc
+OSError: [Errno None] Could not contact DNS servers
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "c:\Users\seyni\bitcoin_orderflow_app\production_package\server.py", line 571, in background_engine
+    raw = await data_fetcher.fetch_all_async(http_session, fetch_klines=is_heavy_tick)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\seyni\bitcoin_orderflow_app\production_package\data_fetcher.py", line 322, in fetch_all_async
+    async with session.get(
+               ~~~~~~~~~~~^
+        f"{config.BINANCE_FUTURES_BASE}/klines",
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        params={"symbol": "BTCUSDT", "interval": config.TIMEFRAME, "limit": config.CANDLE_LIMIT}
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ) as r:
+    ^
+  File "c:\Users\seyni\AppData\Local\Programs\Python\Python313\Lib\site-packages\aiohttp\client.py", line 1510, in __aenter__
+    self._resp: _RetType = await self._coro
+                           ^^^^^^^^^^^^^^^^
+  File "c:\Users\seyni\AppData\Local\Programs\Python\Python313\Lib\site-packages\aiohttp\client.py", line 779, in _request
+    resp = await handler(req)
+           ^^^^^^^^^^^^^^^^^^
+  File "c:\Users\seyni\AppData\Local\Programs\Python\Python313\Lib\site-packages\aiohttp\client.py", line 734, in _connect_and_send_request
+    conn = await self._connector.connect(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        req, traces=traces, timeout=real_timeout
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "c:\Users\seyni\AppData\Local\Programs\Python\Python313\Lib\site-packages\aiohttp\connector.py", line 642, in connect
+    proto = await self._create_connection(req, traces, timeout)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\seyni\AppData\Local\Programs\Python\Python313\Lib\site-packages\aiohttp\connector.py", line 1209, in _create_connection
+    _, proto = await self._create_direct_connection(req, traces, timeout)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\seyni\AppData\Local\Programs\Python\Python313\Lib\site-packages\aiohttp\connector.py", line 1538, in _create_direct_connection
+    raise ClientConnectorDNSError(req.connection_key, exc) from exc
+aiohttp.client_exceptions.ClientConnectorDNSError: Cannot connect to host fapi.binance.com:443 ssl:default [Could not contact DNS servers]
+2026-05-04 11:22:41,733 [INFO] aggregator.data_fetcher: Scarico Orderbook completo iniziale...
+2026-05-04 11:22:48,977 [INFO] uvicorn.error: 127.0.0.1:64459 - "WebSocket /ws" [accepted]
+2026-05-04 11:22:48,981 [INFO] aggregator: Client WS connesso. Totale: 1
+2026-05-04 11:33:07,349 [INFO] aggregator: Client WS disconnesso. Rimasti: 0
+2026-05-04 13:48:12,952 [INFO] uvicorn.error: Started server process [24316]
+2026-05-04 13:48:12,954 [INFO] uvicorn.error: Waiting for application startup.
+2026-05-04 13:48:12,955 [INFO] aggregator: Aggregatore avviato — versione produzione 24h
+2026-05-04 13:48:13,029 [INFO] aggregator.data_fetcher: Scarico Orderbook completo iniziale...
+2026-05-04 13:48:13,154 [INFO] aggregator: Motore di Background avviato
+2026-05-04 13:48:13,302 [INFO] aggregator: Caricate 800 candele dal DB
+2026-05-04 13:48:13,825 [INFO] aggregator: Caricati 80000 trade dal DB
+2026-05-04 13:48:13,843 [INFO] uvicorn.error: Application startup complete.
+2026-05-04 13:48:13,864 [INFO] uvicorn.error: Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+2026-05-04 13:48:23,522 [INFO] aggregator: Caricati 971 bucket heatmap 1m dal DB
+2026-05-04 13:48:30,685 [INFO] aggregator: Caricati 519 bucket heatmap 5m dal DB
+2026-05-04 13:48:36,029 [INFO] aggregator: Caricati 271 bucket heatmap 15m dal DB
+2026-05-04 13:48:38,534 [INFO] aggregator: Caricati 72 bucket heatmap 1h dal DB
+2026-05-04 13:48:40,942 [INFO] aggregator: Caricati 29 bucket heatmap 4h dal DB
+2026-05-04 13:48:42,619 [INFO] aggregator: Caricati 13 bucket heatmap 1d dal DB
+2026-05-04 13:51:16,465 [WARNING] aggregator.bot_analyzer: [AI] Modello non trovato. Uso logica standard.
+2026-05-04 13:51:16,949 [INFO] uvicorn.error: Started server process [9408]
+2026-05-04 13:51:16,951 [INFO] uvicorn.error: Waiting for application startup.
+2026-05-04 13:51:16,952 [INFO] aggregator: Aggregatore avviato â€” versione produzione 24h
+2026-05-04 13:51:17,002 [INFO] aggregator.data_fetcher: Scarico Orderbook completo iniziale...
+2026-05-04 13:51:17,038 [INFO] aggregator: Motore di Background avviato
+2026-05-04 13:51:17,097 [INFO] aggregator: Caricate 800 candele dal DB
+2026-05-04 13:51:17,343 [INFO] aggregator: Caricati 80000 trade dal DB
+2026-05-04 13:51:17,351 [INFO] uvicorn.error: Application startup complete.
+2026-05-04 13:51:17,360 [INFO] uvicorn.error: Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+2026-05-04 13:51:27,526 [INFO] aggregator: Caricati 992 bucket heatmap 1m dal DB
+2026-05-04 13:51:28,475 [INFO] uvicorn.error: 127.0.0.1:51357 - "WebSocket /ws" [accepted]
+2026-05-04 13:51:28,478 [INFO] aggregator: Client WS connesso. Totale: 1
+2026-05-04 13:51:34,970 [INFO] aggregator: Caricati 531 bucket heatmap 5m dal DB
+2026-05-04 13:51:40,079 [INFO] aggregator: Caricati 278 bucket heatmap 15m dal DB
+2026-05-04 13:51:42,985 [INFO] aggregator: Caricati 74 bucket heatmap 1h dal DB
+2026-05-04 13:51:44,888 [INFO] aggregator: Caricati 31 bucket heatmap 4h dal DB
+2026-05-04 13:51:46,625 [INFO] aggregator: Caricati 14 bucket heatmap 1d dal DB
+2026-05-04 13:56:33,184 [INFO] aggregator.bot_analyzer: [AI] Modello caricato con successo
+2026-05-04 13:56:33,684 [INFO] uvicorn.error: Started server process [11772]
+2026-05-04 13:56:33,685 [INFO] uvicorn.error: Waiting for application startup.
+2026-05-04 13:56:33,686 [INFO] aggregator: Aggregatore avviato â€” versione produzione 24h
+2026-05-04 13:56:33,741 [INFO] aggregator.data_fetcher: Scarico Orderbook completo iniziale...
+2026-05-04 13:56:33,788 [INFO] aggregator: Motore di Background avviato
+2026-05-04 13:56:33,834 [INFO] aggregator: Caricate 800 candele dal DB
+2026-05-04 13:56:34,079 [INFO] aggregator: Caricati 80000 trade dal DB
+2026-05-04 13:56:34,087 [INFO] uvicorn.error: Application startup complete.
+2026-05-04 13:56:34,108 [INFO] uvicorn.error: Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+2026-05-04 13:56:46,006 [INFO] aggregator: Caricati 1035 bucket heatmap 1m dal DB
+2026-05-04 13:56:46,625 [INFO] uvicorn.error: 127.0.0.1:63557 - "WebSocket /ws" [accepted]
+2026-05-04 13:56:46,627 [INFO] aggregator: Client WS connesso. Totale: 1
+2026-05-04 13:56:52,586 [INFO] aggregator: Caricati 555 bucket heatmap 5m dal DB
+2026-05-04 13:56:57,526 [INFO] aggregator: Caricati 292 bucket heatmap 15m dal DB
+2026-05-04 13:57:00,442 [INFO] aggregator: Caricati 78 bucket heatmap 1h dal DB
+2026-05-04 13:57:02,306 [INFO] aggregator: Caricati 32 bucket heatmap 4h dal DB
+2026-05-04 13:57:04,009 [INFO] aggregator: Caricati 15 bucket heatmap 1d dal DB
+2026-05-04 14:04:42,317 [INFO] aggregator.bot_analyzer: [AI] Modello caricato con successo
+2026-05-04 14:04:43,267 [INFO] uvicorn.error: Started server process [23764]
+2026-05-04 14:04:43,268 [INFO] uvicorn.error: Waiting for application startup.
+2026-05-04 14:04:43,270 [INFO] aggregator: Aggregatore avviato â€” versione produzione 24h
+2026-05-04 14:04:43,333 [INFO] aggregator.data_fetcher: Scarico Orderbook completo iniziale...
+2026-05-04 14:04:43,366 [INFO] aggregator: Motore di Background avviato
+2026-05-04 14:04:43,425 [INFO] aggregator: Caricate 800 candele dal DB
+2026-05-04 14:04:43,700 [INFO] aggregator: Caricati 80000 trade dal DB
+2026-05-04 14:04:43,708 [INFO] uvicorn.error: Application startup complete.
+2026-05-04 14:04:43,720 [INFO] uvicorn.error: Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+2026-05-04 14:04:54,019 [INFO] aggregator: Caricati 1113 bucket heatmap 1m dal DB
+2026-05-04 14:04:54,876 [INFO] uvicorn.error: 127.0.0.1:63542 - "WebSocket /ws" [accepted]
+2026-05-04 14:04:54,878 [INFO] aggregator: Client WS connesso. Totale: 1
+2026-05-04 14:05:01,677 [INFO] aggregator: Caricati 592 bucket heatmap 5m dal DB
+2026-05-04 14:05:07,849 [INFO] aggregator: Caricati 313 bucket heatmap 15m dal DB
+2026-05-04 14:05:10,319 [INFO] aggregator: Caricati 84 bucket heatmap 1h dal DB
+2026-05-04 14:05:12,324 [INFO] aggregator: Caricati 34 bucket heatmap 4h dal DB
+2026-05-04 14:05:14,366 [INFO] aggregator: Caricati 16 bucket heatmap 1d dal DB
+2026-05-04 14:06:03,175 [INFO] aggregator: Client WS disconnesso. Rimasti: 0
+2026-05-04 20:30:48,431 [INFO] aggregator.bot_analyzer: [AI] Modello caricato con successo
+2026-05-04 20:30:49,241 [INFO] uvicorn.error: Started server process [9328]
+2026-05-04 20:30:49,241 [INFO] uvicorn.error: Waiting for application startup.
+2026-05-04 20:30:49,242 [INFO] aggregator: Aggregatore avviato â€” versione produzione 24h
+2026-05-04 20:30:49,305 [INFO] aggregator.data_fetcher: Scarico Orderbook completo iniziale...
+2026-05-04 20:30:49,326 [INFO] aggregator: Motore di Background avviato
+2026-05-04 20:30:49,389 [INFO] aggregator: Caricate 800 candele dal DB
+2026-05-04 20:30:49,733 [INFO] aggregator: Caricati 60000 trade dal DB
+2026-05-04 20:30:49,738 [INFO] uvicorn.error: Application startup complete.
+2026-05-04 20:30:49,748 [INFO] uvicorn.error: Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+2026-05-04 20:31:04,415 [INFO] aggregator: Caricati 1113 bucket heatmap 1m dal DB
+2026-05-04 20:31:05,125 [INFO] uvicorn.error: 127.0.0.1:61231 - "WebSocket /ws" [accepted]
+2026-05-04 20:31:05,129 [INFO] aggregator: Client WS connesso. Totale: 1
+2026-05-04 20:31:13,954 [INFO] aggregator: Caricati 592 bucket heatmap 5m dal DB
+2026-05-04 20:31:21,829 [INFO] aggregator: Caricati 313 bucket heatmap 15m dal DB
+2026-05-04 20:31:24,335 [INFO] aggregator: Caricati 84 bucket heatmap 1h dal DB
+2026-05-04 20:31:26,413 [INFO] aggregator: Caricati 34 bucket heatmap 4h dal DB
+2026-05-04 20:31:28,205 [INFO] aggregator: Caricati 16 bucket heatmap 1d dal DB
+2026-05-04 20:33:34,289 [INFO] aggregator: Client WS disconnesso. Rimasti: 0
+2026-05-04 20:33:34,727 [INFO] uvicorn.error: 127.0.0.1:64455 - "WebSocket /ws" [accepted]
+2026-05-04 20:33:34,729 [INFO] aggregator: Client WS connesso. Totale: 1
