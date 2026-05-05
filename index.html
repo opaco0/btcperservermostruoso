@@ -1,0 +1,3654 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BTC Multi-Exchange Aggregator Pro</title>
+    <link rel="icon" href="data:,">
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/regl@2.1.0/dist/regl.min.js"></script>
+    <style>
+        :root {
+            --bg: #0a0a0f; --panel: #111118; --toolbar: #16161f; --border: #2a2e39;
+            --text: #e8e8ed; --text-dim: #9ca3af; --text-muted: #6b7280;
+            --green: #00d084; --red: #ff4976; --amber: #f59e0b;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body { height: 100%; width: 100%; overflow: hidden; background: var(--bg); color: var(--text);
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+        body { display: flex; flex-direction: column; }
+
+        #header { height: 44px; background: var(--toolbar); border-bottom: 1px solid var(--border);
+            display: flex; align-items: center; padding: 0 14px; gap: 8px; flex-shrink: 0; }
+        #header .title { font-size: 13px; font-weight: 700; color: var(--text); margin-right: 8px; }
+        .btn { background: var(--panel); color: var(--text-dim); border: 1px solid var(--border);
+            padding: 4px 10px; border-radius: 4px; cursor: pointer; font-weight: 600; font-size: 11px; white-space: nowrap; }
+        .btn:hover { background: #1e1e2e; color: var(--text); }
+        .btn.active { background: var(--amber); color: #000; border-color: var(--amber); }
+        .btn.on { background: rgba(0,208,132,0.15); color: var(--green); border-color: rgba(0,208,132,0.4); }
+        .btn.off { background: rgba(255,73,118,0.15); color: var(--red); border-color: rgba(255,73,118,0.4); }
+        .tf-container { display: flex; gap: 3px; margin-left: auto; }
+        .btn-tf { background: var(--panel); color: var(--text-muted); }
+        .btn-tf.active-tf { background: var(--amber); color: #000; }
+
+        #bot-bar { height: 34px; background: #13131a; border-bottom: 1px solid var(--border);
+            display: flex; align-items: center; padding: 0 16px; gap: 18px; font-size: 11px; flex-shrink: 0; }
+        #bot-direction { font-weight: 800; font-size: 13px; }
+        .bot-stat { color: var(--text-muted); font-weight: 600; }
+
+        /* Pulsanti storico nella bot-bar */
+        .bot-stat-btn { background: transparent; border: 1px solid transparent; color: var(--text-muted); font-weight: 600; font-size: 11px; cursor: pointer; padding: 2px 6px; border-radius: 4px; font-family: inherit; transition: all 0.15s; }
+        .bot-stat-btn:hover { background: rgba(255,255,255,0.06); border-color: var(--border); color: var(--text); }
+        .bot-stat-btn span { color: var(--text); font-weight: 700; }
+
+        /* --- AI STATUS BADGE --- */
+        .ai-status-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 0 10px;
+            border-left: 1px solid var(--border);
+            margin-left: 10px;
+        }
+
+        .ai-badge {
+            font-size: 9px;
+            font-weight: 800;
+            padding: 2px 8px;
+            border-radius: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            transition: all 0.3s ease;
+        }
+
+        .ai-active {
+            background: rgba(34, 201, 94, 0.15);
+            color: #22c55e;
+            border: 1px solid rgba(34, 197, 94, 0.4);
+            box-shadow: 0 0 8px rgba(34, 197, 94, 0.2);
+        }
+
+        .ai-standard {
+            background: rgba(245, 158, 11, 0.15);
+            color: #f59e0b;
+            border: 1px solid rgba(245, 158, 11, 0.4);
+        }
+
+        .model-date-text {
+            font-size: 8px;
+            color: var(--text-muted);
+            margin-top: 2px;
+            font-family: monospace;
+        }
+
+        #workspace {
+            flex: 1;
+            display: grid;
+            grid-template-columns: 1fr 260px;
+            grid-template-rows: 1fr 130px;
+            min-height: 0;
+            overflow: hidden;
+        }
+        #master-chart {
+            background: transparent;
+            min-height: 0;
+            overflow: hidden;
+            height: 100%;
+            width: 100%;
+            cursor: crosshair;
+        }
+        #master-wrapper {
+            grid-row: 1; grid-column: 1;
+            position: relative;
+            min-height: 0;
+            height: 100%; /* FONDAMENTALE */
+            width: 100%;  /* FONDAMENTALE */
+        }
+
+        .cl-item { display: flex; align-items: center; gap: 8px; font-weight: 600; min-width: 60px; }
+        .cl-circle { 
+            background: rgba(104, 22, 131, 0.6);
+            border: 1px solid #681683; 
+            border-radius: 50%;
+            display: inline-block; /* FONDAMENTALE */
+            flex-shrink: 0;        /* FONDAMENTALE */
+        }
+        #ob-panel {
+            grid-row: 1; grid-column: 2;
+            background: var(--panel);
+            border-left: 1px solid var(--border);
+            display: grid;
+            grid-template-rows: 32px 1fr;
+            min-height: 0;
+            overflow: hidden;
+        }
+        #delta-panel {
+            grid-row: 2; grid-column: 1 / 3;
+            background: var(--panel);
+            border-top: 1px solid var(--border);
+            display: grid;
+            grid-template-rows: 22px 1fr;
+            min-height: 0;
+            overflow: hidden;
+            position: relative;
+        }
+        #delta-header { background: var(--toolbar); display: flex; align-items: center;
+            padding: 0 10px; font-size: 9px; font-weight: 700; color: var(--text-muted); border-bottom: 1px solid var(--border); gap: 8px; }
+        #delta-header select { height: 16px; padding: 0 4px; font-size: 9px; font-weight: 700; font-family: inherit;
+            border: 1px solid var(--border); border-radius: 3px; background: var(--toolbar); color: var(--text);
+            cursor: pointer; flex-shrink: 0; appearance: none; -webkit-appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8' viewBox='0 0 24 24' fill='%236b7280'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat; background-position: right 3px center; padding-right: 12px; }
+        #delta-header select:focus { outline: none; border-color: var(--amber); }
+                #delta-chart { 
+            min-height: 0; 
+            overflow: hidden !important; 
+            position: relative; 
+            height: 100% !important; 
+            width: 100% !important; 
+        }
+        #delta-tooltip {
+            position: absolute;
+            pointer-events: none;
+            z-index: 200;
+            background: rgba(17, 17, 24, 0.95);
+            border: 1px solid #2a2e39;
+            border-radius: 6px;
+            padding: 6px 10px;
+            font-size: 11px;
+            color: #e8e8ed;
+            display: none;
+            white-space: nowrap;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+        #delta-tooltip .tt-row { display: flex; gap: 10px; align-items: center; line-height: 1.5; }
+        #delta-tooltip .tt-label { color: #9ca3af; font-weight: 600; min-width: 70px; }
+        #delta-tooltip .tt-val  { font-weight: 700; }
+        #vp-tooltip {
+            position: absolute;
+            pointer-events: none;
+            z-index: 250;
+            background: rgba(14, 14, 22, 0.97);
+            border: 1px solid #3a3e4d;
+            border-radius: 7px;
+            padding: 8px 12px;
+            font-size: 11px;
+            color: #e8e8ed;
+            display: none;
+            white-space: nowrap;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.7);
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            min-width: 160px;
+        }
+        #vp-tooltip .vp-tt-title { font-size: 9px; font-weight: 700; color: #6b7280; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px; border-bottom: 1px solid #2a2e39; padding-bottom: 4px; }
+        #vp-tooltip .tt-row { display: flex; justify-content: space-between; align-items: center; line-height: 1.6; gap: 14px; }
+        #vp-tooltip .tt-label { color: #9ca3af; font-weight: 600; }
+        #vp-tooltip .tt-val  { font-weight: 700; text-align: right; }
+        #vp-tooltip .vp-delta-bar { height: 4px; border-radius: 2px; margin-top: 5px; background: #1f222d; overflow: hidden; }
+        #vp-tooltip .vp-delta-bar-fill { height: 100%; border-radius: 2px; transition: width 0.1s; }
+        .modal-tooltip {
+            position: absolute;
+            pointer-events: none;
+            z-index: 200;
+            background: rgba(17, 17, 24, 0.95);
+            border: 1px solid #2a2e39;
+            border-radius: 6px;
+            padding: 6px 10px;
+            font-size: 11px;
+            color: #e8e8ed;
+            display: none;
+            white-space: nowrap;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+        .modal-tooltip .tt-row { display: flex; gap: 10px; align-items: center; line-height: 1.5; }
+        .modal-tooltip .tt-label { color: #9ca3af; font-weight: 600; min-width: 50px; }
+        .modal-tooltip .tt-val  { font-weight: 700; }
+
+        #ob-header { background: var(--toolbar); border-bottom: 1px solid var(--border);
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 0 10px; font-size: 10px; font-weight: 700; color: var(--text-muted); }
+        #ob-canvas { min-height: 0; width: 100%; height: 100%; cursor: crosshair; }
+        #ob-filter-badge {
+            display: none; font-size: 9px; font-weight: 700;
+            background: rgba(245,158,11,0.12); color: var(--amber);
+            border: 1px solid rgba(245,158,11,0.35); border-radius: 3px;
+            padding: 1px 6px; white-space: nowrap;
+        }
+
+        #yaxis-hint {
+            position: absolute;
+            left: 0; top: 50%;
+            transform: translateY(-50%) rotate(-90deg);
+            transform-origin: center center;
+            font-size: 8px;
+            color: #2a2e39;
+            pointer-events: none;
+            white-space: nowrap;
+            letter-spacing: 1px;
+            font-weight: 700;
+            transition: color 0.2s;
+            z-index: 5;
+            user-select: none;
+        }
+        #master-chart:hover #yaxis-hint { color: #4b5563; }
+        #cluster-legend {
+            position: absolute;
+            bottom: 30px;
+            left: 100px;
+            z-index: 500;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: rgba(17, 17, 24, 0.85);
+            border: 1px solid var(--border);
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 10px;
+            color: var(--text-muted);
+            pointer-events: none;
+        }
+        #cluster-legend span { font-weight: 700; color: var(--text-dim); }
+        .conn-connected { background: rgba(0,208,132,0.15); color: var(--green); border: 1px solid rgba(0,208,132,0.3); }
+        .conn-disconnected { background: rgba(255,73,118,0.15); color: var(--red); border: 1px solid rgba(255,73,118,0.3); }
+        #conn-status { position: fixed; top: 50px; right: 14px; z-index: 300; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px; pointer-events: none; }
+
+        /* Modali multipli — fluttuanti e trascinabili */
+        .modal-box { 
+            position: absolute; top: 80px;
+            background: var(--panel); border: 1px solid var(--border); border-radius: 8px; 
+            width: 92%; max-width: 720px; height: 420px; display: none; flex-direction: column; 
+            overflow: hidden; box-shadow: 0 20px 50px rgba(0,0,0,0.7); pointer-events: auto; 
+            z-index: 200;
+        }
+        .modal-box.visible { display: flex; }
+        .modal-header { height: 40px; background: var(--toolbar); border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; padding: 0 14px; flex-shrink: 0; cursor: grab; }
+        .modal-header:active { cursor: grabbing; }
+        .modal-header h3 { font-size: 13px; color: var(--text); margin: 0; font-weight: 700; pointer-events: none; }
+        .modal-close { background: none; border: none; color: var(--text-dim); font-size: 20px; cursor: pointer; line-height: 1; padding: 0 4px; }
+        .modal-close:hover { color: var(--text); }
+        .modal-body { flex: 1; min-height: 0; padding: 10px; position: relative; }
+        .modal-header select { height: 20px; padding: 0 4px; font-size: 9px; font-weight: 700; font-family: inherit;
+            border: 1px solid var(--border); border-radius: 3px; background: var(--toolbar); color: var(--text);
+            cursor: pointer; flex-shrink: 0; appearance: none; -webkit-appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8' viewBox='0 0 24 24' fill='%236b7280'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat; background-position: right 3px center; padding-right: 12px; }
+        .modal-header select:focus { outline: none; border-color: var(--amber); }
+        .history-chart { width: 100%; height: 100%; }
+
+        /* Posizioni iniziali distinte */
+        .modal-delta { left: 5%; }
+        .modal-power { left: 35%; }
+        .modal-td { left: 65%; }
+
+
+        #y-slider { position: absolute; left: 72px; top: 35px; bottom: 25px; width: 18px; z-index: 100; pointer-events: auto; background: rgba(22,22,31,0.8); border-left: 1px solid #2a2e39; }
+        #y-slider-handle { position: absolute; left: 0; right: 0; background: rgba(245,158,11,0.5); border: 2px solid rgba(245,158,11,0.9); border-radius: 3px; cursor: grab; min-height: 20px; }
+        #y-slider-handle:hover { background: rgba(245,158,11,0.7); }
+        #y-slider-handle:active { cursor: grabbing; background: rgba(245,158,11,0.9); }
+
+        /* MODIFICA: MEDIA QUERY PER MOBILE */
+        @media (max-width: 768px) {
+            #header { flex-wrap: wrap; height: auto; padding: 6px; }
+            #header .title { font-size: 11px; margin-right: 0; }
+            .btn { padding: 2px 6px; font-size: 10px; }
+            .tf-container { margin-left: 0; margin-top: 4px; width: 100%; justify-content: center; }
+            #bot-bar { height: auto; padding: 8px; flex-wrap: wrap; gap: 6px; font-size: 10px; }
+            #workspace { grid-template-columns: 1fr; grid-template-rows: 1fr 180px auto; }
+            #master-wrapper { grid-row: 1; grid-column: 1; }
+            #ob-panel { grid-row: 2; grid-column: 1; border-left: none; border-top: 1px solid var(--border); }
+            #delta-panel { grid-row: 3; grid-column: 1; }
+            #cluster-legend { bottom: 10px; left: 10px; font-size: 8px; }
+            .modal-box { width: 96%; max-width: 96%; left: 2% !important; top: 50px; }
+        }
+
+        /* MODIFICA: maniglia resize modali */
+        .resize-handle {
+            position: absolute;
+            right: 0;
+            bottom: 0;
+            width: 14px;
+            height: 14px;
+            cursor: nwse-resize;
+            background: transparent;
+            z-index: 10;
+        }
+        .resize-handle::after {
+            content: '';
+            position: absolute;
+            right: 2px;
+            bottom: 2px;
+            width: 0;
+            height: 0;
+            border-style: solid;
+            border-width: 0 0 10px 10px;
+            border-color: transparent transparent #4b5563 transparent;
+        }
+
+
+        /* CSS per collassare il pannello Delta (Sicuro per ECharts) */
+        #workspace.hide-delta {
+            grid-template-rows: 1fr 0px !important;
+        }
+        #workspace.hide-delta #delta-panel {
+            height: 0 !important;
+            min-height: 0 !important;
+            border-top: none !important;
+            overflow: hidden !important;
+            visibility: hidden;
+        }
+        @media (max-width: 768px) {
+            #workspace.hide-delta {
+                grid-template-rows: 1fr 180px 0px !important;
+            }
+        }    </style>
+
+        
+
+<base target="_blank">
+</head>
+<body>
+
+<div id="header">
+    <span class="title">Multi-Exchange Aggregator</span>
+    <button id="btn-live" class="btn active" onclick="setLiveMode()">LIVE</button>
+    <button id="btn-ai-toggle" class="btn off" onclick="toggleAction('toggle_ai','btn-ai-toggle','AI')">AI: ON</button>
+    <button id="btn-freeze" class="btn" onclick="toggleAction('toggle_heatmap','btn-freeze','Freeze')">Freeze: OFF</button>
+    <button id="btn-spotlight" class="btn" onclick="toggleAction('toggle_spotlight','btn-spotlight','Spotlight')">Spotlight: ON</button>
+    <button id="btn-nvec" class="btn" onclick="toggleAction('toggle_nvec','btn-nvec','NVEC')">NVEC: OFF</button>
+    <button id="btn-delta-panel" class="btn on" onclick="toggleDeltaPanel()">Delta: ON</button>
+    <button id="btn-clusters" class="btn on" onclick="toggleAction('toggle_clusters','btn-clusters','Clusters')">Clusters: OFF</button>
+    <button id="btn-ma" class="btn on" onclick="toggleAction('toggle_ma','btn-ma','MA')">MA: ON</button>
+    <button id="btn-line" class="btn" onclick="toggleAction('toggle_line','btn-line','Style')">Style: Candles</button>
+
+    <div class="tf-container">
+        
+
+
+        <button class="btn btn-tf" data-tf="1m" onclick="changeTF('1m')">1M</button>
+        <button class="btn btn-tf active-tf" data-tf="5m" onclick="changeTF('5m')">5M</button>
+        <button class="btn btn-tf" data-tf="15m" onclick="changeTF('15m')">15M</button>
+        <button class="btn btn-tf" data-tf="1h" onclick="changeTF('1h')">1H</button>
+        <button class="btn btn-tf" data-tf="4h" onclick="changeTF('4h')">4H</button>
+        <button class="btn btn-tf" data-tf="1d" onclick="changeTF('1d')">1D</button>
+    </div>
+</div>
+
+
+
+<div id="bot-bar">
+    <span style="color:var(--text-muted); font-weight:700;">Prospettiva Algoritmica Live:</span>
+    <span id="bot-direction">ATTENDERE...</span> <span style="color:#374151">|</span>
+
+    <!-- Container per il badge che usa le classi CSS sopra -->
+    <div class="ai-status-wrapper">
+        <div id="ai-badge" class="ai-badge ai-standard">Checking...</div>
+        <div id="model-date" class="model-date-text">--</div>
+    </div>
+
+    <span style="color:#374151">|</span>
+    <span id="bot-prob"></span>
+    <div style="margin-left:auto; display:flex; gap:16px; align-items:center;">
+        <button class="bot-stat-btn" onclick="openDeltaModal()">Delta AI: <span id="bot-delta">--</span></button>
+        <button class="bot-stat-btn" onclick="openPowerModal()">Delta Pwr: <span id="bot-power">--</span></button>
+        <button class="bot-stat-btn" onclick="openTdModal()">TD: <span id="bot-td">--</span></button>
+        <select id="vp-hours" class="bot-stat-btn" style="background: transparent; border: 1px solid var(--border); color: var(--text-muted); font-size: 11px; cursor: pointer; padding: 2px 6px; border-radius: 4px; margin-left: 8px;" onchange="changeVPLookback(this.value)">
+            <option value="0.083">VP: 5m</option>
+            <option value="0.166">VP: 10m</option>
+            <option value="0.5">VP: 30m</option>
+            <option value="1">VP: 1h</option>
+            <option value="4">VP: 4h</option>
+            <option value="24" selected>VP: 24h</option>
+        </select>
+        <button class="bot-stat-btn">TD Score: <span id="bot-td-score">--</span></button>
+        <button class="bot-stat-btn">TD Trend: <span id="bot-td-trend">--</span></button>
+    </div>
+</div>
+
+<div id="workspace">
+    <div id="master-wrapper">
+        <!-- LAYERING DOM (z-index):
+             1 = hm-canvas    → heatmap (sotto tutto)
+             5 = master-chart → candele ECharts (sopra heatmap)
+            20 = vp-canvas    → volume profile (sopra tutto)
+        -->
+        <canvas id="hm-canvas" style="position:absolute; top:0; left:0; width:100%; height:100%; z-index:1; pointer-events:none; background: var(--panel);"></canvas>
+        <div id="master-chart" style="position:relative; z-index:5; height:100%; width:100%; background: transparent;">
+            <div id="yaxis-hint">⟵ TRASCINA ⟶</div>
+        </div>
+        <canvas id="fp-canvas" style="position:absolute; top:0; left:0; width:100%; height:100%; z-index:7; pointer-events:none;"></canvas> <!-- AGGIUNTO -->
+        <canvas id="vp-canvas" style="position:absolute; top:0; left:0; width:100%; height:100%; z-index:20; pointer-events:none;"></canvas>
+        <div id="y-slider"><div id="y-slider-handle"></div></div>
+        <div id="vp-tooltip"></div>
+        <div id="cluster-legend">
+            <span>Volume Cluster:</span>
+            <!-- 100 BTC = 10px -->
+            <div class="cl-item"><div class="cl-circle" style="width:10px; height:10px;"></div>100</div>
+            <!-- 1.000 BTC = 20px -->
+            <div class="cl-item"><div class="cl-circle" style="width:20px; height:20px;"></div>1K</div>
+            <!-- 10.000 BTC = 30px -->
+            <div class="cl-item"><div class="cl-circle" style="width:30px; height:30px;"></div>10K+</div>
+        </div>
+    </div>
+    <div id="ob-panel">
+        <div id="ob-header"><span>ORDER BOOK</span><span id="ob-filter-badge" title="Ordini aggregati > 1000 BTC nascosti">⚡ &gt;1K filter</span><span id="ob-spread">Spread: --</span></div>
+        <canvas id="ob-canvas"></canvas>
+    </div>
+    <div id="delta-panel">
+        <div id="delta-header">
+            <span>Net Volume / Delta Analysis</span>
+            <select id="delta-window" onchange="changeDeltaWindow(this.value)">
+                <option value="5">5 min</option>
+                <option value="10" selected>10 min</option>
+                <option value="20">20 min</option>
+            </select>
+        </div>
+        <div id="delta-chart"></div>
+        <div id="delta-tooltip"></div>
+    </div>
+</div>
+
+<div id="conn-status" class="conn-disconnected">Offline</div>
+
+<!-- === TRE FINESTRE MOBILI INDIPENDENTI === -->
+<div id="modal-delta" class="modal-box modal-delta">
+    <div class="modal-header">
+        <h3>Delta AI — Storico Strategia Algoritmica</h3>
+        <div style="display:flex; align-items:center; gap:8px;">
+            <select id="modal-window-bot" onchange="changeModalWindow('bot', this.value)">
+                <option value="5">5m</option>
+                <option value="10">10m</option>
+                <option value="20" selected>20m</option>
+            </select>
+            <button class="modal-close" onclick="closeHistoryModal('bot')">&times;</button>
+        </div>
+    </div>
+    <div class="modal-body">
+        <div id="history-chart-delta" class="history-chart"></div>
+        <div id="tooltip-bot" class="modal-tooltip"></div>
+    </div>
+    <div class="resize-handle"></div>
+</div>
+
+<div id="modal-power" class="modal-box modal-power">
+    <div class="modal-header">
+        <h3>Delta Power — Pressione OB Locale (±50$)</h3>
+        <div style="display:flex; align-items:center; gap:8px;">
+            <select id="modal-window-power" onchange="changeModalWindow('power', this.value)">
+                <option value="5" selected>5m</option>
+                <option value="10">10m</option>
+                <option value="20">20m</option>
+            </select>
+            <button class="modal-close" onclick="closeHistoryModal('power')">&times;</button>
+        </div>
+    </div>
+    <div class="modal-body">
+        <div id="history-chart-power" class="history-chart"></div>
+        <div id="tooltip-power" class="modal-tooltip"></div>
+    </div>
+    <div class="resize-handle"></div>
+</div>
+
+<div id="modal-td" class="modal-box modal-td">
+    <div class="modal-header">
+        <h3>Trade Delta (TD)</h3>
+        <div style="display:flex; align-items:center; gap:8px;">
+            <select id="modal-window-td" onchange="changeModalWindow('td', this.value)">
+                <option value="5">5m</option>
+                <option value="10" selected>10m</option>
+                <option value="20">20m</option>
+            </select>
+            <button class="modal-close" onclick="closeHistoryModal('td')">&times;</button>
+        </div>
+    </div>
+    <div class="modal-body">
+        <div id="history-chart-td" class="history-chart"></div>
+        <div id="tooltip-td" class="modal-tooltip"></div>
+    </div>
+    <div class="resize-handle"></div>
+</div>
+
+<script>
+// --- INIT ECHARTS ---
+const chartDom = document.getElementById('master-chart');
+const deltaDom = document.getElementById('delta-chart');
+const chart = echarts.init(chartDom, null, { renderer: 'canvas' });
+const deltaChart = echarts.init(deltaDom, null, { renderer: 'canvas' });
+
+const hmCanvas = document.getElementById('hm-canvas');
+
+let uiState = {
+    showAiLevels: true, showClusters: false, showNvec: false,
+    showMovingAvg: true, showLineChart: false, showHeatmapStatic: false, showSpotlight: true
+};
+
+// Riferimento DPR per pixel-perfect alignment con ECharts (Retina / mobile)
+let _dpr = window.devicePixelRatio || 1;
+
+// ===== WEBGL HEATMAP RENDERER (regl) con fallback Canvas2D =====
+let drawHeatmapCmd = null;
+let offsetBufferWGL, sizeBufferWGL, colorBufferWGL;
+let hmCtx = null;  // fallback Canvas2D context
+let _reglInstance = null;
+
+function initHeatmapWebGL() {
+    if (!hmCanvas) return;
+
+    // Prova WebGL (regl CDN esporta `regl` nel global scope)
+    if (typeof regl === 'function') {
+        try {
+            _reglInstance = regl({
+                canvas: hmCanvas,
+                attributes: { alpha: true, antialias: false, premultipliedAlpha: false },
+                optionalExtensions: ['ANGLE_instanced_arrays']
+            });
+
+            // Se regl() ritorna null/undefined senza eccezione, passa al fallback
+            if (!_reglInstance || typeof _reglInstance !== 'function') {
+                throw new Error('regl() returned invalid instance');
+            }
+
+            const quad = [
+                [0, 0], [1, 0], [0, 1],
+                [0, 1], [1, 0], [1, 1]
+            ];
+
+            drawHeatmapCmd = _reglInstance({
+                vert: `
+                    precision mediump float;
+                    attribute vec2 position;
+                    attribute vec2 a_offset;
+                    attribute vec2 a_size;
+                    attribute vec3 a_color;
+                    varying vec3 v_color;
+                    uniform vec2 u_resolution;
+                    void main() {
+                        v_color = a_color;
+                        vec2 pixel_pos = a_offset + position * a_size;
+                        vec2 clip = (pixel_pos / u_resolution) * 2.0 - 1.0;
+                        gl_Position = vec4(clip.x, -clip.y, 0.0, 1.0);
+                    }
+                `,
+                frag: `
+                    precision mediump float;
+                    varying vec3 v_color;
+                    void main() {
+                        gl_FragColor = vec4(v_color, 1.0);
+                    }
+                `,
+                attributes: {
+                    position: quad,
+                    a_offset: { buffer: _reglInstance.prop('offsetBuffer'), divisor: 1 },
+                    a_size:   { buffer: _reglInstance.prop('sizeBuffer'),   divisor: 1 },
+                    a_color:  { buffer: _reglInstance.prop('colorBuffer'),  divisor: 1 }
+                },
+                uniforms: {
+                    u_resolution: ({ viewportWidth, viewportHeight }) => [viewportWidth, viewportHeight]
+                },
+                depth: { enable: false },
+                blend: {
+                    enable: true,
+                    func: {
+                        srcRGB: 'src alpha',
+                        srcAlpha: 1,
+                        dstRGB: 'one minus src alpha',
+                        dstAlpha: 'one minus src alpha'
+                    }
+                },
+                primitive: 'triangles',
+                count: 6,
+                instances: _reglInstance.prop('count')
+            });
+
+            // Se il comando non viene creato, passa al fallback
+            if (!drawHeatmapCmd) {
+                throw new Error('drawHeatmapCmd creation failed');
+            }
+
+            const MAX_CELLS = 300000;
+            offsetBufferWGL = _reglInstance.buffer({ type: 'float', usage: 'dynamic', length: MAX_CELLS * 2 * 4 });
+            sizeBufferWGL   = _reglInstance.buffer({ type: 'float', usage: 'dynamic', length: MAX_CELLS * 2 * 4 });
+            colorBufferWGL  = _reglInstance.buffer({ type: 'float', usage: 'dynamic', length: MAX_CELLS * 3 * 4 });
+
+            console.log('Heatmap WebGL inizializzato (regl)');
+            return;
+        } catch (e) {
+            console.warn('WebGL init fallito, fallback Canvas2D:', e);
+            _reglInstance = null;
+            drawHeatmapCmd = null;
+        }
+    }
+
+    // Fallback Canvas2D
+    hmCtx = hmCanvas.getContext('2d', { alpha: true });
+    console.log('Heatmap Canvas2D fallback attivo');
+}
+
+// Helper: converte colore hex in RGB float 0-1
+function hexToRGB(hex) {
+    const n = parseInt(hex.slice(1), 16);
+    return {
+        r: ((n >> 16) & 0xFF) / 255,
+        g: ((n >> 8) & 0xFF) / 255,
+        b: (n & 0xFF) / 255
+    };
+}
+
+// Helper: interpola tra due colori hex → RGB float
+function lerpRGB(hex1, hex2, t) {
+    const c1 = hexToRGB(hex1);
+    const c2 = hexToRGB(hex2);
+    return {
+        r: c1.r + (c2.r - c1.r) * t,
+        g: c1.g + (c2.g - c1.g) * t,
+        b: c1.b + (c2.b - c1.b) * t
+    };
+}
+
+
+function getInterpolatedColor(v, th, colors) {
+    if (!th || !colors || th.length === 0) return null;
+
+    // Clamp v al massimo threshold: i volumi si accumulano per bucket nel tempo,
+    // quindi valori grezzi possono superare 4000 BTC e restituire bianco puro.
+    // Clampiamo per saturare al colore più caldo senza mai andare oltre #ffffff.
+    const vClamped = Math.min(v, th[th.length - 1]);
+
+    if (vClamped <= th[0]) {
+        return lerpRGB(colors[0], colors[1], vClamped / th[0]);
+    }
+    for (let i = 1; i < th.length; i++) {
+        if (vClamped <= th[i]) {
+            return lerpRGB(colors[i], colors[i + 1], (vClamped - th[i - 1]) / (th[i] - th[i - 1]));
+        }
+    }
+    return hexToRGB(colors[colors.length - 1]);
+}
+
+function getHeatmapColorRGB(v) {
+    const p = window._hmColorParams;
+    if (!p || v < p.th) return null;
+    return getInterpolatedColor(v, p.thresholds, p.colors);
+}
+
+// ─── NORMALIZZAZIONE DINAMICA HEATMAP ────────────────────────────────────────
+// I volumi si accumulano per-bucket nel tempo: un livello da 5 BTC aggiornato
+// ogni 5s per 1 ora diventa 3600 BTC — sopra ogni soglia colore.
+// Calcoliamo il p95 dei volumi visibili e scaliamo le soglie di colore in modo
+// che il p95 corrisponda all'80% della scala — nessuna cella diventa mai bianca
+// a meno che non sia davvero un picco estremo rispetto al contesto corrente.
+const _hmNorm = { scale: 1.0, lastUpdate: -Infinity };
+
+function refreshHeatmapNorm() {
+    const now = performance.now();
+    if (now - _hmNorm.lastUpdate < 2000) return; // max ogni 2 secondi
+    _hmNorm.lastUpdate = now;
+
+    if (!heatmapBuckets.size) return;
+
+    // Campionamento veloce: max 8000 valori (evita sort su milioni di entries)
+    const vols = [];
+    let step = 1;
+    const allEntries = [];
+    for (const priceMap of heatmapBuckets.values())
+        for (const v of priceMap.values()) allEntries.push(v);
+    if (allEntries.length > 8000) step = Math.ceil(allEntries.length / 8000);
+
+    for (let i = 0; i < allEntries.length; i += step) {
+        const v = allEntries[i];
+        const t = (v.bid || 0) + (v.ask || 0);
+        if (t > 0) vols.push(t);
+    }
+    if (vols.length < 10) return;
+
+    vols.sort((a, b) => a - b);
+    const n = vols.length;
+    const p95 = vols[Math.min(n - 1, Math.floor(n * 0.95))];
+
+    
+    // Map p95 → 80% del top threshold (lascia margine per i veri picchi rossi/bianchi)
+    const topTh = (window._hmColorParams?.thresholds?.[5] ?? 4000) * 0.80;
+    const rawScale = p95 > 0 ? topTh / p95 : 1.0;
+    
+    // MODIFICA: Abbassato il clamp a 0.0001 per assorbire volumi cumulativi estremi
+    _hmNorm.scale = Math.max(0.0001, Math.min(200, rawScale));
+}
+
+
+// NUOVA FUNZIONE: Individuatore di Prossimità (Zona Neutra ±100$ + Esp. Dolcissimo)
+function getHeatmapColorForCell(price, bidVol, askVol) {
+    const p = window._hmColorParams;
+    const th = p?.thresholds;
+    if (!p || !th || th.length === 0) return null;
+
+    const totalVol = bidVol + askVol;
+    if (totalVol <= 0) return null;
+
+    // --- 🎯 INDIVIDUATORE DI PROSSIMITÀ (Zona Neutra ±100$) ---
+    let proximityScale = 1.0;
+    
+    if (lastPrice > 0) {
+        const dist = Math.abs(price - lastPrice);
+        
+        // Applica l'effetto SOLO fuori dal range di ±100$
+        if (dist > 100) {
+            // Sottraiamo 100 per avere una transizione senza "salti" cromatici
+            const outerDist = dist - 100;
+            
+            // 🎛️ PARAMETRI ANCORA PIÙ SMORZATI:
+            // '4000' = Curva lentissima e dolcissima
+            // '0.5'  = Boost massimo limitato a 2.0x (es. 500 BTC sembreranno 1000 BTC)
+            proximityScale = Math.max(0.5, Math.exp(-outerDist / 5000)); 
+        }
+    }
+
+    const effectiveVol = totalVol / proximityScale;
+    // -------------------------------------------------------------
+
+    // --- EFFETTO SPOTLIGHT ---
+    let currentThreshold = p.th;
+    if (uiState.showSpotlight && th.length > 2) {
+        currentThreshold = th[th.length - 2]; 
+    }
+
+    if (effectiveVol < currentThreshold) return null;
+
+    const netVol = bidVol - askVol;
+    if (netVol > 0) {
+        return getInterpolatedColor(effectiveVol, th, p.blueColors);
+    } else {
+        if (effectiveVol < p.th) return null;
+        return getInterpolatedColor(effectiveVol, th, p.colors);
+    }
+}
+
+initHeatmapWebGL();
+
+// ─── TYPED ARRAYS PRE-ALLOCATI PER WebGL (zero GC per frame) ────────────────
+// Creare Float32Array nuovi ad ogni frame forza il garbage collector.
+// Allochiamo una volta sola e usiamo un write-pointer per riempire in-place.
+const _WGL_MAX_CELLS = 250000;
+const _wglOffsets = new Float32Array(_WGL_MAX_CELLS * 2);
+const _wglSizes   = new Float32Array(_WGL_MAX_CELLS * 2);
+const _wglColors  = new Float32Array(_WGL_MAX_CELLS * 3);
+
+function findStartIndex(arr, targetTime) {
+    let left = 0, right = arr.length - 1;
+    let result = arr.length;
+    while (left <= right) {
+        const mid = (left + right) >> 1; // divisione intera veloce
+        if (arr[mid][0] >= targetTime) {
+            result = mid;
+            right = mid - 1;
+        } else {
+            left = mid + 1;
+        }
+    }
+    return result;
+}
+
+function drawHeatmapCanvas() {
+    if (!hmCanvas || !chart) return;
+    const wCss = chart.getWidth();
+    const hCss = chart.getHeight();
+    if (hmCanvas.width !== wCss || hmCanvas.height !== hCss) {
+        hmCanvas.width = wCss;
+        hmCanvas.height = hCss;
+        if (_reglInstance) _reglInstance.poll();
+    }
+
+    const yExt = getYRange();
+    let xExt = null;
+    try { xExt = chart.getModel().getComponent('xAxis', 0).axis.scale.getExtent(); } catch(e){}
+    if (!yExt || !xExt) return;
+    const minT = xExt[0], maxT = xExt[1];
+    const minP = yExt.min, maxP = yExt.max;
+
+    let grid;
+    try {
+        const coordSystem = chart.getModel().getComponent('grid', 0).coordinateSystem;
+        if (!coordSystem) return;
+        grid = coordSystem.getRect();
+    } catch (e) { return; }
+    if (!grid) return;
+    const gX = grid.x, gY = grid.y, gW = grid.width, gH = grid.height;
+
+    const bucketDurSec = (window._hmBucketDuration || 300);
+    const bucketDurMs = bucketDurSec * 1000;
+    const pStep = window._hmPInterval || 5.0;
+    const pxPerT = gW / (maxT - minT);
+    const pxPerP = gH / (maxP - minP);
+    const rectW = Math.max(1, bucketDurMs * pxPerT);
+    const rectH = Math.max(1, pStep * pxPerP);
+
+    const vMinT = minT - bucketDurMs;
+    const vMaxT = maxT + bucketDurMs;
+    const vMinP = minP - pStep;
+    const vMaxP = maxP + pStep;
+
+    // Aggiorna normalizzazione (max ogni 2s, no-op quando cached)
+    refreshHeatmapNorm();
+
+    // === WEBGL PATH — typed arrays pre-allocati, zero GC per frame ===
+    if (_reglInstance && drawHeatmapCmd && offsetBufferWGL) {
+        let idx = 0; // write pointer
+
+        for (const [bucketTs, priceMap] of heatmapBuckets) {
+            const t = bucketTs * 1000;
+            if (t < vMinT || t > vMaxT) continue;
+            const x = gX + ((t + bucketDurMs / 2) - minT) * pxPerT - rectW / 2;
+
+            for (const [price, vols] of priceMap) {
+                if (price < vMinP || price > vMaxP) continue;
+                const bidVol = vols.bid || 0;
+                const askVol = vols.ask || 0;
+
+                const c = getHeatmapColorForCell(price, bidVol, askVol);
+                if (!c) continue;
+
+                if (idx >= _WGL_MAX_CELLS) break; // guard overflow
+
+                const y = gY + gH - ((price + pStep / 2) - minP) * pxPerP - rectH / 2;
+                const oi = idx * 2, si = idx * 2, ci = idx * 3;
+                _wglOffsets[oi]     = x;
+                _wglOffsets[oi + 1] = y;
+                _wglSizes[si]       = rectW;
+                _wglSizes[si + 1]   = rectH;
+                _wglColors[ci]      = c.r;
+                _wglColors[ci + 1]  = c.g;
+                _wglColors[ci + 2]  = c.b;
+                idx++;
+            }
+        }
+
+        // Pulisce SEMPRE il frame precedente (anche se spotlight ha filtrato tutto)
+        _reglInstance.clear({ color: [0, 0, 0, 0], depth: 1 });
+
+        if (idx > 0) {
+            // Carica SOLO i dati scritti (subarray = view senza copia)
+            offsetBufferWGL(_wglOffsets.subarray(0, idx * 2));
+            sizeBufferWGL(_wglSizes.subarray(0, idx * 2));
+            colorBufferWGL(_wglColors.subarray(0, idx * 3));
+
+            drawHeatmapCmd({
+                offsetBuffer: offsetBufferWGL,
+                sizeBuffer:   sizeBufferWGL,
+                colorBuffer:  colorBufferWGL,
+                count:        idx
+            });
+        }
+        return;
+    }
+
+    // === CANVAS2D FALLBACK ===
+    if (!hmCtx) return;
+    hmCtx.clearRect(0, 0, wCss, hCss);
+    hmCtx.save();
+    hmCtx.beginPath();
+    hmCtx.rect(gX, gY - 1, gW + 1, gH + 2);
+    hmCtx.clip();
+
+    for (const [bucketTs, priceMap] of heatmapBuckets) {
+        const t = bucketTs * 1000;
+        if (t < vMinT || t > vMaxT) continue;
+        const x = gX + ((t + bucketDurMs / 2) - minT) * pxPerT - rectW / 2;
+
+        for (const [price, vols] of priceMap) {
+            if (price < vMinP || price > vMaxP) continue;
+            const bidVol = vols.bid || 0;
+            const askVol = vols.ask || 0;
+
+            const c = getHeatmapColorForCell(price, bidVol, askVol);
+            if (!c) continue;
+
+            const y = gY + gH - ((price + pStep / 2) - minP) * pxPerP - rectH / 2;
+            hmCtx.fillStyle = `rgb(${Math.round(c.r * 255)},${Math.round(c.g * 255)},${Math.round(c.b * 255)})`;
+            hmCtx.fillRect(Math.round(x), Math.round(y), Math.ceil(rectW), Math.ceil(rectH));
+        }
+    }
+
+    hmCtx.restore();
+}
+const ro = new ResizeObserver(() => { 
+    _dpr = window.devicePixelRatio || 1;  // refresh DPR
+    chart.resize(); 
+    if (window.isDeltaVisible !== false) deltaChart.resize(); 
+    if (hmCanvas && chart) {
+        hmCanvas.width = chart.getWidth();
+        hmCanvas.height = chart.getHeight();
+        if (_reglInstance) _reglInstance.poll();
+    }
+    window._hmNeedsRedraw = true;
+});
+ro.observe(chartDom); ro.observe(deltaDom);
+
+
+
+const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+let ws;
+let wsReconnectTimer = null;
+let wsReconnectDelay = 1000;       // 1 secondo iniziale
+const wsMaxReconnectDelay = 30000; // massimo 30 secondi
+let wsConnected = false;
+
+// Rimosso: auto-scaling gestito dinamicamente da ECharts
+
+async function loadHeatmapSnapshot(tf, mergeExisting = false) {
+    const gen = ++_hmLoadGeneration;
+    try {
+        const response = await fetch(`/api/heatmap_snapshot_bin?tf=${tf}`);
+        const buffer = await response.arrayBuffer();
+
+        // Stale: il TF è cambiato durante il fetch, ignora la risposta
+        if (gen !== _hmLoadGeneration) return;
+
+        const view = new DataView(buffer);
+        let offset = 0;
+
+        const snapshotSeq = view.getUint32(offset, true); offset += 1 * 4;
+        const tfCode = view.getUint8(offset); offset += 1;
+        const nBuckets = view.getUint32(offset, true); offset += 4;
+
+        // ── Se non stiamo facendo merge (primo avvio o cambio TF), svuota lo store
+        if (!mergeExisting) {
+            heatmapBuckets.clear();
+            liveBucketKeys.clear();
+        }
+
+        // ── Applica solo se lo snapshot è più recente dell'ultimo seq applicato via WS.
+        // Questo previene il caso in cui WS ha già caricato dati più aggiornati dello snapshot.
+        // In merge mode, aggiorniamo comunque (i dati storici non sovrascrivono quelli live).
+        const applySnapshot = snapshotSeq >= lastAppliedSeq;
+
+        for (let i = 0; i < nBuckets; i++) {
+            const bucketTs = view.getFloat64(offset, true); offset += 8;
+            const nPrices = view.getUint32(offset, true); offset += 4;
+
+            // In merge mode, non sovrascrivere bucket già arrivati via WS live
+            const isLiveBucket = liveBucketKeys.has(bucketTs);
+
+            let bucket = heatmapBuckets.get(bucketTs);
+            if (!bucket) {
+                bucket = new Map();
+                heatmapBuckets.set(bucketTs, bucket);
+            }
+
+            for (let j = 0; j < nPrices; j++) {
+                const price = view.getFloat32(offset, true); offset += 4;
+                const bidVol = view.getFloat32(offset, true); offset += 4;
+                const askVol = view.getFloat32(offset, true); offset += 4;
+                // In merge: se il bucket è già live non sovrascrivere (dati WS più freschi)
+                if (!isLiveBucket || !mergeExisting) {
+                    bucket.set(price, {bid: bidVol, ask: askVol});
+                }
+            }
+        }
+
+        // Aggiorna seq solo se lo snapshot è più recente
+        if (snapshotSeq > lastAppliedSeq) {
+            lastAppliedSeq = snapshotSeq;
+        }
+
+        _hmInitialized = true;
+        applyHMUpdates();
+    } catch (error) {
+        console.error("Errore caricamento heatmap snapshot:", error);
+    }
+}
+
+function connectWS() {
+    // 1. Pulizia radicale del vecchio socket per evitare conflitti e memory leak
+    if (ws) {
+        ws.onopen = null;
+        ws.onclose = null;
+        ws.onerror = null;
+        ws.onmessage = null;
+        try { ws.close(); } catch(e) {}
+    }
+
+    // 2. Prevenzione dei loop di riconnessione (uccide i vecchi timer)
+    if (wsReconnectTimer) {
+        clearTimeout(wsReconnectTimer);
+        wsReconnectTimer = null;
+    }
+
+    ws = new WebSocket(`${wsProtocol}//${window.location.host}/ws`);
+    ws.binaryType = 'arraybuffer';
+
+    ws.onopen = () => {
+        wsConnected = true;
+        wsReconnectDelay = 1000; // reset delay
+        document.getElementById('conn-status').className = 'conn-connected';
+        document.getElementById('conn-status').textContent = 'Live';
+        console.log('WS connesso');
+
+        // ── RESET SEQ: fondamentale per gestire riavvii del server (seq torna a 0).
+        // Senza questo, tutti i messaggi binari vengono scartati finché il server
+        // non supera il vecchio lastAppliedSeq (potrebbe richiedere minuti).
+        lastAppliedSeq = 0;
+        // Reset render state delta chart
+        deltaChart._lastRenderedTs = 0;
+        deltaChart._lastCleanup    = 0;
+
+        const activeTF = document.querySelector('.btn-tf.active-tf')?.dataset.tf || '5m';
+        loadHeatmapSnapshot(activeTF, _hmInitialized);   // clearExisting=false se già inizializzato
+
+        // 3. Reset dei dati del grafico: forza un aggiornamento completo al primo pacchetto
+        lastCandleTs = 0;
+
+        // 4. Sincronizzazione di stato: comunichiamo al backend cosa stiamo guardando!
+        ws.send(JSON.stringify({ action: 'change_tf', tf: activeTF }));
+        
+        const vpSelect = document.getElementById('vp-hours');
+        if (vpSelect) {
+            ws.send(JSON.stringify({ action: 'change_vp_lookback', hours: parseFloat(vpSelect.value) }));
+        }
+    };
+
+    ws.onclose = (e) => {
+        wsConnected = false;
+        document.getElementById('conn-status').className = 'conn-disconnected';
+        document.getElementById('conn-status').textContent = 'Offline';
+        console.log(`WS disconnesso (Codice: ${e ? e.code : 'Sconosciuto'}). Riconnessione tra ${wsReconnectDelay/1000}s`);
+        
+        // Assicurati che ci sia un SOLO timer in esecuzione
+        if (wsReconnectTimer) clearTimeout(wsReconnectTimer);
+        wsReconnectTimer = setTimeout(connectWS, wsReconnectDelay);
+        wsReconnectDelay = Math.min(wsReconnectDelay * 1.5, wsMaxReconnectDelay);
+    };
+
+    ws.onerror = (err) => {
+        console.error('WS errore:', err);
+        // Evitiamo di forzare ws.close() ciecamente. Il browser chiamerà in automatico onclose.
+        if (ws.readyState === WebSocket.OPEN) {
+            ws.close(); 
+        }
+    };
+
+    ws.onmessage = (e) => {
+        try {
+            if (typeof e.data === 'string') {
+                const d = JSON.parse(e.data);
+                if (d.type === 'update') updateUI(d);
+            } else if (e.data instanceof ArrayBuffer) {
+                // Parsing differenziale unificato nel main thread
+                const buffer = e.data;
+                const view = new DataView(buffer);
+                let offset = 0;
+
+                // Lettura Sequence Number (Punto 3.2)
+                const seq = view.getUint32(offset, true); offset += 4;
+                if (seq <= lastAppliedSeq) return; // Scarta messaggi vecchi o fuori ordine
+                lastAppliedSeq = seq;
+
+                const tfCode = view.getUint8(offset); offset += 1;
+                const nBuckets = view.getUint32(offset, true); offset += 4;
+
+                const tfMap = {1:'1m', 2:'5m', 3:'15m', 4:'1h', 5:'4h', 6:'1d'};
+                const msgTf = tfMap[tfCode] || '';
+
+                // Sicurezza: aggiorna solo se il TF corrisponde a quello attivo
+                const activeTF = document.querySelector('.btn-tf.active-tf')?.dataset.tf;
+                if (!msgTf || msgTf !== activeTF) return;
+
+                for (let i = 0; i < nBuckets; i++) {
+                    const bucketTs = view.getFloat64(offset, true); offset += 8;
+                    const nPrices = view.getUint32(offset, true); offset += 4;
+
+                    let bucket = heatmapBuckets.get(bucketTs);
+                    if (!bucket) {
+                        bucket = new Map();
+                        heatmapBuckets.set(bucketTs, bucket);
+                    }
+                    liveBucketKeys.add(bucketTs);
+
+                    for (let j = 0; j < nPrices; j++) {
+                        const price = view.getFloat32(offset, true); offset += 4;
+                        const bidVol = view.getFloat32(offset, true); offset += 4;
+                        const askVol = view.getFloat32(offset, true); offset += 4;
+                        bucket.set(price, {bid: bidVol, ask: askVol});
+                    }
+                }
+
+                // Pulizia bucket vuoti
+                for (const [bt, pmap] of heatmapBuckets) {
+                    let allZero = true;
+                    for (const v of pmap.values()) {
+                        if (v.bid > 0 || v.ask > 0) { allZero = false; break; }
+                    }
+                    if (allZero) heatmapBuckets.delete(bt);
+                }
+
+                applyHMUpdates();
+            }
+        } catch (err) {
+            console.error('Errore di decodifica WS:', err);
+        }
+    };
+}
+
+connectWS(); // avvia la prima connessione
+
+let currentObStep = 10;
+let currentCandleData = [];
+let yAxisMode = 'auto';
+let yDataZoomEnabled = true;
+let lastPrice = 0;
+let lastObData = null;
+let lastVpRawData = null;
+let lastFootprintData = {};
+
+// Buffer storici per i popup
+let globalDeltaHistory = [];
+let globalTradeDeltaHistory = [];
+let globalObPowerHistory = [];
+let globalBotHistory = [];
+let globalNvecHistory = [];
+let globalTradeSignals = [];
+
+function pruneOldDeltaData() {
+    const cutoff = Date.now() - 20 * 60 * 1000; // 20 minuti fa
+    globalDeltaHistory = globalDeltaHistory.filter(p => p[0] >= cutoff);
+    globalTradeDeltaHistory = globalTradeDeltaHistory.filter(p => p[0] >= cutoff);
+    globalObPowerHistory = globalObPowerHistory.filter(p => p[0] >= cutoff);
+    globalNvecHistory = globalNvecHistory.filter(p => p[0] >= cutoff);
+    globalBotHistory = globalBotHistory.filter(p => p[0] >= cutoff);
+}
+
+setInterval(pruneOldDeltaData, 30000); // ogni 30 secondi
+
+// Gestione multi-finestra
+const activeModals = new Set();
+const historyCharts = {};
+const dragState = { activeModal: null, offsetX: 0, offsetY: 0 };
+
+
+
+// Config lato client (mirror di config.py)
+const CONFIG = {
+    HEATMAP_BUCKET_DURATION_BY_TF: { '1m': 60, '5m': 300, '15m': 900, '1h': 3600, '4h': 14400, '1d': 86400 },
+    ORDERBOOK_STEP_BY_TF: { '1m': 1.0, '5m': 5.0, '15m': 15.0, '1h': 30.0, '4h': 50.0, '1d': 100.0 },
+    COLOR_CANDLE_UP: '#681683',
+    COLOR_FG: '#e8e8ed',
+    HEMAP_MAX_BUCKETS_MEMORY: 500
+};
+window._hmBucketDuration = 300;
+window._hmPInterval = 5;
+window._vpStep = 10;
+
+// Parametri colore heatmap dinamici dal server
+let hmColorParams = {
+    min_volume: 0.4, vol_low: 100, vol_medium: 500, vol_high: 1000,
+    cold_start: '#012201', cold_mid: '#023802', cold_end: '#026202',
+    hot_start: '#fc3737', hot_mid: '#fd8936', hot_end: '#fff048'
+};
+// ═══════════════════════════════════════════════════════════════════════════
+// 🎨 COLORI HEATMAP — Scala termica fluida freddo → caldo
+// ═══════════════════════════════════════════════════════════════════════════
+//
+//   0–100 BTC    → lerp('#0d1f0d', '#166534', v/100)       // verde scurissimo → bosco
+//   100–300 BTC  → lerp('#166534', '#4ade80', (v-100)/200)  // bosco → verde brillante
+//   300–600 BTC  → lerp('#4ade80', '#facc15', (v-300)/300)  // verde → giallo
+//   600–1000 BTC → lerp('#facc15', '#fb923c', (v-600)/400)  // giallo → arancione
+//   1000–2000 BTC→ lerp('#fb923c', '#ef4444', (v-1000)/1000)// arancione → rosso
+//   2000–4000 BTC→ lerp('#ef4444', '#ffffff', (v-2000)/2000) // rosso → bianco
+//   >4000 BTC    → '#ffffff'
+//
+// ═══════════════════════════════════════════════════════════════════════════
+window._hmColorParams = {
+    th: 0.05,
+    thresholds: [100, 300, 600, 1000, 2000, 4000],
+    _baseThresholds: [100, 300, 600, 1000, 2000, 4000],
+    colors: [
+        '#0d1f0d',  // [0]    0 BTC    — verde scurissimo
+        '#166534',  // [1]  100 BTC    — verde bosco
+        '#4ade80',  // [2]  300 BTC    — verde brillante
+        '#facc15',  // [3]  600 BTC    — giallo
+        '#fb923c',  // [4] 1000 BTC    — arancione
+        '#ef4444',  // [5] 2000 BTC    — rosso
+        '#ffffff'   // [6] 4000+ BTC   — bianco
+    ],
+    
+    // Scala Blu fluida (Bids) — da quasi nero a azzurro ghiaccio
+    blueColors: [
+        '#030d1f',  // [0]    0 BTC    — blu scurissimo (quasi nero)
+        '#0f3373',  // [1]  100 BTC    — blu navy
+        '#154da6',  // [2]  300 BTC    — blu cobalto
+        '#1e66d9',  // [3]  600 BTC    — blu brillante
+        '#3384f5',  // [4] 1000 BTC    — azzurro forte
+        '#59abff',  // [5] 2000 BTC    — azzurro cielo
+        '#e6f5ff'   // [6] 4000+ BTC   — azzurro ghiaccio
+    ],
+};
+
+let lastCandleTs = 0;
+// NUOVO: Store bucket-based heatmap
+// Map<bucketTs, Map<price, {bid: vol, ask: vol}>>
+const heatmapBuckets = new Map();
+// Set di bucket arrivati via WS (per non sovrascrivere con storico)
+const liveBucketKeys = new Set();
+let lastAppliedSeq = 0;
+// Flag: true dopo il primo snapshot riuscito. Usato per decidere se fare merge o replace al reconnect.
+let _hmInitialized = false;
+
+const hmCacheByTF = {};   // cache per timeframe
+let isInteracting = false;
+let interactionTimeout = null;
+
+// Cache hash per evitare setOption inutili sui grafici delta — sfarfallio fix
+let _lastDeltaHash = '';
+let _lastNvecHash = '';
+let _lastModalHash = { bot: '', power: '', td: '' };
+let _modalUpdatePending = false;
+
+// Contatore generazione per invalidare fetch heatmap obsolete (cambio TF rapido)
+let _hmLoadGeneration = 0;
+
+function _hashArray(arr) {
+    if (!arr || arr.length === 0) return '';
+    const last = arr[arr.length - 1];
+    return arr.length + '|' + (last[0] || 0) + '|' + (typeof last[1] === 'number' ? last[1].toFixed(2) : '0');
+}
+
+function mergeTimeSeries(existing, incoming) {
+    if (!incoming || incoming.length === 0) return existing;
+    const cutoff = Date.now() - 25 * 60 * 1000;
+
+    // Fast path: tutti i punti in arrivo sono più recenti dell'ultimo esistente
+    // → nessun merge necessario, semplice concatenazione O(n) invece di O(n log n)
+    if (existing.length > 0) {
+        const lastTs = existing[existing.length - 1][0];
+        const firstNew = incoming[0];
+        if (firstNew && firstNew.length >= 2 && firstNew[0] > lastTs) {
+            // Pruning pigro: rimuovi solo i vecchi dalla testa se necessario
+            let startIdx = 0;
+            while (startIdx < existing.length && existing[startIdx][0] < cutoff) startIdx++;
+            const base = startIdx === 0 ? existing : existing.slice(startIdx);
+            const toAdd = incoming.filter(pt => pt && pt.length >= 2 && pt[0] >= cutoff);
+            return base.concat(toAdd);
+        }
+    }
+
+    // Slow path: merge completo con deduplicazione (necessario solo in caso di overlap storico)
+    const map = new Map(existing.map(p => [p[0], p[1]]));
+    for (const pt of incoming) {
+        if (!pt || pt.length < 2) continue;
+        map.set(pt[0], pt[1]);
+    }
+    return Array.from(map.entries())
+        .filter(([t]) => t >= cutoff)
+        .sort((a, b) => a[0] - b[0])
+        .map(([t, v]) => [t, v]);
+}
+
+
+// Finestra temporale del pannello Delta/NVEC (minuti)
+let deltaWindowMinutes = 10;
+let deltaAutoScroll = true;
+
+// Finestra temporale dei grafici modali (minuti)
+const modalWindowMinutes = { bot: 20, power: 5, td: 10 };
+
+// TF per cui il filtro >1000 BTC è attivo (deve corrispondere a config.ORDERBOOK_FILTER_TFS)
+const OB_FILTER_TFS = new Set(['15m', '1h', '4h', '1d']);
+
+function updateObFilterBadge(tf) {
+    const badge = document.getElementById('ob-filter-badge');
+    if (!badge) return;
+    badge.style.display = OB_FILTER_TFS.has(tf) ? 'inline-block' : 'none';
+}
+
+function lerpColor(a, b, amount) {
+    const ah = parseInt(a.replace(/#/g, ''), 16),
+          ar = ah >> 16, ag = ah >> 8 & 0xff, ab = ah & 0xff,
+          bh = parseInt(b.replace(/#/g, ''), 16),
+          br = bh >> 16, bg = bh >> 8 & 0xff, bb = bh & 0xff,
+          rr = ar + amount * (br - ar),
+          rg = ag + amount * (bg - ag),
+          rb = ab + amount * (bb - ab);
+    return '#' + ((1 << 24) + (Math.round(rr) << 16) + (Math.round(rg) << 8) + Math.round(rb)).toString(16).slice(1);
+}
+
+function getHeatmapColor(v) {
+    // Usa window._hmColorParams con thresholds: 100,300,600,1000,2000,4000
+    const p = window._hmColorParams;
+    if (!p || !p.thresholds || !p.colors) {
+        // Fallback hardcoded allineato alla scala termica fluida
+        if (Math.abs(v) < 0.05) return 'transparent';
+        if (v <= 100) return lerpColor('#0d1f0d', '#166534', v / 100);
+        if (v <= 300) return lerpColor('#166534', '#4ade80', (v - 100) / 200);
+        if (v <= 600) return lerpColor('#4ade80', '#facc15', (v - 300) / 300);
+        if (v <= 1000) return lerpColor('#facc15', '#fb923c', (v - 600) / 400);
+        if (v <= 2000) return lerpColor('#fb923c', '#ef4444', (v - 1000) / 1000);
+        if (v <= 4000) return lerpColor('#ef4444', '#ffffff', (v - 2000) / 2000);
+        return '#ffffff';
+    }
+
+    if (v < p.th) return 'transparent';
+
+    const th = p.thresholds;
+    const cl = p.colors;
+
+    if (v <= th[0]) {
+        return lerpColor(cl[0], cl[1], v / th[0]);
+    }
+    for (let i = 1; i < th.length; i++) {
+        if (v <= th[i]) {
+            return lerpColor(cl[i], cl[i + 1], (v - th[i - 1]) / (th[i] - th[i - 1]));
+        }
+    }
+    return cl[cl.length - 1];
+}
+
+function fmtVol(v) {
+    if (v === 0) return '0';
+    if (v >= 1_000_000) return (v/1_000_000).toFixed(2) + 'M';
+    if (v >= 1000)      return (v/1000).toFixed(1) + 'K';
+    if (v >= 1)         return v.toFixed(0);
+    return v.toFixed(2);
+}
+
+// --- MODALI STORICI (MULTI FINESTRA) ---
+function openHistoryModal(title, seriesData, color, type, modalId, chartDivId, unit) {
+    activeModals.add(type);
+    const modal = document.getElementById(modalId);
+    modal.classList.add('visible');
+    modal.querySelector('h3').textContent = title;
+
+    if (historyCharts[type]) { historyCharts[type].dispose(); delete historyCharts[type]; }
+    const dom = document.getElementById(chartDivId);
+    const hc = echarts.init(dom, null, { renderer: 'canvas' });
+    historyCharts[type] = hc;
+
+    // ── TOOLTIP MODALE ──
+    const modalTooltipConfig = {
+        'bot':   { tooltipId: 'tooltip-bot',   label: 'Prob', unit: '%',   colorPos: '#a855f7', colorNeg: '#ef4444', getData: () => globalBotHistory },
+        'power': { tooltipId: 'tooltip-power', label: 'PWR',  unit: '$',   colorPos: '#f59e0b', colorNeg: '#f59e0b', getData: () => globalObPowerHistory },
+        'td':    { tooltipId: 'tooltip-td',    label: 'TD',   unit: 'BTC', colorPos: '#00f2ff', colorNeg: '#00f2ff', getData: () => globalTradeDeltaHistory }
+    };
+    const ttCfg = modalTooltipConfig[type];
+    if (ttCfg) {
+        const tt = document.getElementById(ttCfg.tooltipId);
+        if (tt) {
+            hc.getZr().on('mousemove', function(params) {
+                const evt = params.event;
+                const mb = dom.parentElement;
+                const mbr = mb.getBoundingClientRect();
+                const point = hc.convertFromPixel({seriesIndex: 0}, [params.offsetX, params.offsetY]);
+                if (!point || point.length < 1) { tt.style.display = 'none'; return; }
+                const t = point[0];
+                const val = findNearestValue(ttCfg.getData(), t);
+                if (val === null) { tt.style.display = 'none'; return; }
+                const col = (type === 'bot') ? ttCfg.colorPos : (val >= 0 ? ttCfg.colorPos : ttCfg.colorNeg);
+                const sign = (type === 'bot') ? '' : (val >= 0 ? '+' : '');
+                const unitStr = ttCfg.unit ? ` ${ttCfg.unit}` : '';
+                tt.innerHTML = `<div class="tt-row"><span class="tt-label">${ttCfg.label}:</span><span class="tt-val" style="color:${col};">${sign}${val.toFixed(1)}${unitStr}</span></div>`;
+                tt.style.display = 'block';
+                let left = (evt.clientX - mbr.left) + 14;
+                let top  = (evt.clientY - mbr.top) - 10;
+                const tw = tt.offsetWidth || 80;
+                if (left + tw > mbr.width) left = (evt.clientX - mbr.left) - tw - 10;
+                if (top < 0) top = 20;
+                tt.style.left = left + 'px';
+                tt.style.top  = top + 'px';
+            });
+            hc.getZr().on('mouseout', function() {
+                tt.style.display = 'none';
+            });
+        }
+    }
+
+    const formatter = unit === '%' ? val => val.toFixed(1) + '%'
+                     : unit === 'BTC' ? val => val.toFixed(1) + ' BTC'
+                     : val => '$' + val.toLocaleString();
+
+    hc.setOption({
+        backgroundColor: 'transparent',
+        animation: false,
+        grid: { left: 14, right: 14, top: 25, bottom: 30 },
+        xAxis: { type: 'time', splitLine: { show: false }, axisLabel: { color: '#6b7280', fontSize: 10 } },
+        yAxis: {
+            type: 'value',
+            scale: false,
+            position: 'left',
+            axisLine: { show: false },
+            axisTick: { show: false },
+            axisLabel: { show: false },
+            splitLine: { lineStyle: { color: '#1f222d' } }
+        },
+        series: [{
+            type: 'line',
+            data: seriesData,
+            smooth: false,
+            symbol: 'none',
+            lineStyle: { color: color, width: 2 }
+        }]
+    });
+}
+
+function closeHistoryModal(type) {
+    activeModals.delete(type);
+    const modalId = type === 'bot' ? 'modal-delta' : (type === 'power' ? 'modal-power' : 'modal-td');
+    document.getElementById(modalId).classList.remove('visible');
+    if (historyCharts[type]) {
+        historyCharts[type].dispose();
+        delete historyCharts[type];
+    }
+}
+
+function openDeltaModal() { openHistoryModal('Delta AI — Storico Strategia Algoritmica', globalBotHistory, '#a855f7', 'bot', 'modal-delta', 'history-chart-delta', '%'); }
+function openPowerModal() { openHistoryModal('Delta Power — Pressione OB Locale (±50$)', globalObPowerHistory, '#f59e0b', 'power', 'modal-power', 'history-chart-power', '$'); }
+function openTdModal() { openHistoryModal('Trade Delta (TD)', globalTradeDeltaHistory, '#00f2ff', 'td', 'modal-td', 'history-chart-td', 'BTC'); }
+
+// --- DRAG & DROP MULTI FINESTRA ---
+function initResizeHandles() {
+    const modalIds = ['modal-delta', 'modal-power', 'modal-td'];
+    modalIds.forEach(id => {
+        const box = document.getElementById(id);
+        const handle = box.querySelector('.resize-handle');
+        if (!handle) return;
+        handle.addEventListener('mousedown', (e) => {
+            e.stopPropagation();
+            e.preventDefault();
+            const startX = e.clientX;
+            const startY = e.clientY;
+            const startW = box.offsetWidth;
+            const startH = box.offsetHeight;
+
+            function onMouseMove(e) {
+                box.style.width = Math.max(300, startW + e.clientX - startX) + 'px';
+                box.style.height = Math.max(200, startH + e.clientY - startY) + 'px';
+            }
+            function onMouseUp() {
+                document.removeEventListener('mousemove', onMouseMove);
+                document.removeEventListener('mouseup', onMouseUp);
+            }
+            document.addEventListener('mousemove', onMouseMove);
+            document.addEventListener('mouseup', onMouseUp);
+        });
+    });
+}
+
+function initAllDraggables() {
+    const modalIds = ['modal-delta', 'modal-power', 'modal-td'];
+    modalIds.forEach(id => {
+        const box = document.getElementById(id);
+        if (!box) return;
+        const header = box.querySelector('.modal-header');
+        if (!header) return;
+
+        header.addEventListener('mousedown', (e) => {
+            if (e.target.classList.contains('modal-close')) return;
+            dragState.activeModal = box;
+            const rect = box.getBoundingClientRect();
+            dragState.offsetX = e.clientX - rect.left;
+            dragState.offsetY = e.clientY - rect.top;
+
+            modalIds.forEach(otherId => {
+                const other = document.getElementById(otherId);
+                if (other) other.style.zIndex = 200;
+            });
+            box.style.zIndex = 300;
+        });
+    });
+}
+
+document.addEventListener('mousemove', (e) => {
+    if (!dragState.activeModal) return;
+    let newLeft = e.clientX - dragState.offsetX;
+    let newTop = e.clientY - dragState.offsetY;
+    newLeft = Math.max(0, Math.min(newLeft, window.innerWidth - dragState.activeModal.offsetWidth));
+    newTop = Math.max(0, Math.min(newTop, window.innerHeight - dragState.activeModal.offsetHeight));
+    dragState.activeModal.style.left = newLeft + 'px';
+    dragState.activeModal.style.top = newTop + 'px';
+});
+
+document.addEventListener('mouseup', () => {
+    dragState.activeModal = null;
+});
+
+// --- VOLUME PROFILE ---
+function drawVolumeProfile(vp) {
+    const vpCanvas = document.getElementById('vp-canvas');
+    if (!vpCanvas || !chart) return;
+    const vpCtx = vpCanvas.getContext('2d');
+
+    const chartW = chart.getWidth();
+    const chartH = chart.getHeight();
+    if (!chartW || !chartH) return;
+
+    // Allineiamo il canvas fisico a quello di ECharts
+    if (vpCanvas.width !== chartW || vpCanvas.height !== chartH) {
+        vpCanvas.width = chartW;
+        vpCanvas.height = chartH;
+    }
+    
+    // Puliamo il frame precedente
+    vpCtx.clearRect(0, 0, chartW, chartH);
+
+    if (!vp || vp.length === 0) return;
+
+    const r = getYRange();
+    if (!r || typeof r.min !== 'number' || typeof r.max !== 'number') return;
+
+    const vpRightEdge = chartW - 8;
+    const vpLeftEdge  = chartW - 155;
+    const maxBarW = Math.max(40, vpRightEdge - vpLeftEdge);
+
+    // ── 1. Trova maxTotalVol (Normalizzazione Globale) ──────────
+    let maxTotalVol = 0;
+    let pocPrice = null;
+    
+    vp.forEach(d => {
+        const total = d[1] + d[2];
+        if (total > maxTotalVol) { 
+            maxTotalVol = total; 
+            pocPrice = d[0]; 
+        }
+    });
+    
+    if (maxTotalVol <= 0) return;
+
+    const yTopPx    = chart.convertToPixel({ yAxisIndex: 0 }, r.max);
+    const yBottomPx = chart.convertToPixel({ yAxisIndex: 0 }, r.min);
+    if (yTopPx == null || yBottomPx == null) return;
+    
+    const pxPerPrice = (yBottomPx - yTopPx) / (r.max - r.min);
+    const vpStep     = window._vpStep || 10;
+    const barHeight  = Math.max(1, Math.abs(vpStep * pxPerPrice) - 1);
+    const sqrtMax    = Math.sqrt(maxTotalVol);
+
+    const renderMin = r.min - (vpStep * 2);
+    const renderMax = r.max + (vpStep * 2);
+
+    // ── 2. SCALA ORIZZONTALE E LEGENDA ──────────
+    const scaleTop = chartH - 38;
+    const scaleH   = 16;
+
+    vpCtx.fillStyle = 'rgba(10,10,15,0.95)';
+    vpCtx.fillRect(vpLeftEdge - 2, scaleTop, maxBarW + 4, scaleH);
+    vpCtx.strokeStyle = '#2a2e39';
+    vpCtx.strokeRect(vpLeftEdge - 2, scaleTop, maxBarW + 4, scaleH);
+
+    vpCtx.strokeStyle = '#4b5563';
+    vpCtx.beginPath();
+    vpCtx.moveTo(vpLeftEdge, scaleTop + scaleH / 2);
+    vpCtx.lineTo(vpRightEdge, scaleTop + scaleH / 2);
+    vpCtx.stroke();
+
+    vpCtx.font = 'bold 8px sans-serif';
+    vpCtx.fillStyle = '#a855f7'; vpCtx.textAlign = 'left'; vpCtx.fillText('▮ Buy', vpLeftEdge, scaleTop - 4);
+    vpCtx.fillStyle = '#f97316'; vpCtx.fillText('▮ Sell', vpLeftEdge + 32, scaleTop - 4);
+    vpCtx.fillStyle = '#f59e0b'; vpCtx.textAlign = 'right'; vpCtx.fillText('POC', vpRightEdge, scaleTop - 4);
+
+    const vpTicks = [
+        { volFrac: 0,    label: '0',                   align: 'left'   },
+        { volFrac: 0.25, label: fmtVol(maxTotalVol * 0.25), align: 'center' },
+        { volFrac: 0.5,  label: fmtVol(maxTotalVol * 0.5),  align: 'center' },
+        { volFrac: 1.0,  label: fmtVol(maxTotalVol),         align: 'right'  }
+    ];
+
+    vpCtx.strokeStyle = '#9ca3af';
+    vpCtx.fillStyle = '#d1d5db';
+    vpCtx.font = 'bold 9px sans-serif';
+
+    vpTicks.forEach(t => {
+        const x = vpLeftEdge + (t.volFrac * maxBarW);
+        vpCtx.beginPath(); vpCtx.moveTo(x, scaleTop + scaleH / 2); vpCtx.lineTo(x, scaleTop + 3); vpCtx.stroke();
+        vpCtx.textAlign = t.align; vpCtx.fillText(t.label, x, scaleTop + scaleH + 11);
+    });
+
+    // --- NUOVO: GRIGLIA VERTICALE DI RIFERIMENTO ---
+    vpCtx.strokeStyle = 'rgba(255, 255, 255, 0.06)'; // Colore molto tenue per non disturbare
+    vpCtx.lineWidth = 1;
+    vpCtx.setLineDash([2, 4]); // Linea tratteggiata per un look pulito
+
+    vpTicks.forEach(t => {
+        // Disegniamo la linea per il 25%, 50% e 100% (saltiamo lo 0 che è il bordo)
+        if (t.volFrac > 0) { 
+            // Ricordati di rimuovere Math.sqrt() anche qui se hai applicato la modifica lineare!
+            const x = vpLeftEdge + (t.volFrac * maxBarW); 
+            
+            vpCtx.beginPath(); 
+            vpCtx.moveTo(x, 0); // Parte dalla cima del canvas
+            vpCtx.lineTo(x, scaleTop); // Arriva fino all'inizio della scala in basso
+            vpCtx.stroke();
+        }
+    });
+    vpCtx.setLineDash([]); // Ripristina la linea continua per gli altri disegni
+
+    // ── 3. DISEGNO DELLE BARRE ──────────
+    vp.forEach(d => {
+        const price = d[0], buy = d[1], sell = d[2];
+        const total = buy + sell;
+        if (total <= 0 || price < renderMin || price > renderMax) return;
+
+        const y = yTopPx + (r.max - price) * pxPerPrice;
+        if (!isFinite(y)) return;
+
+        const totalBarW = (total / maxTotalVol) * maxBarW;
+        const buyW  = totalBarW * (buy  / total);
+        const sellW = totalBarW * (sell / total);
+        const isPoc  = (price === pocPrice);
+        const y0     = y - barHeight / 2;
+
+        // Barra Buy (usa sempre il colore standard)
+        if (buyW > 0.5) {
+            vpCtx.fillStyle = 'rgba(168, 85, 247, 0.92)';
+            vpCtx.fillRect(vpLeftEdge, y0, buyW, barHeight);
+        }
+        // Barra Sell (usa sempre il colore standard)
+        if (sellW > 0.5) {
+            vpCtx.fillStyle = 'rgba(249, 115, 22, 0.92)';
+            vpCtx.fillRect(vpLeftEdge + buyW, y0, sellW, barHeight);
+        }
+
+        // Marker Delta
+        const delta = (buy - sell) / total;
+        const markerX = Math.max(vpLeftEdge, Math.min(vpRightEdge, vpLeftEdge + totalBarW + Math.round(delta * 3)));
+        
+        vpCtx.strokeStyle = delta > 0 ? 'rgba(34, 197, 94, 0.6)' : 'rgba(239, 68, 68, 0.6)';
+        vpCtx.beginPath(); vpCtx.moveTo(markerX, y0); vpCtx.lineTo(markerX, y0 + barHeight); vpCtx.stroke();
+
+        // Se è il POC, disegna solo la lettera 'P' a destra della barra
+        if (isPoc) {
+            vpCtx.fillStyle = '#f59e0b'; // Colore ambra
+            vpCtx.font = 'bold 9px sans-serif';
+            vpCtx.textAlign = 'left';
+            vpCtx.textBaseline = 'middle';
+            
+            // Posiziona la 'P' poco dopo la fine della barra (o del delta marker),
+            // assicurandoti che non esca mai fuori dallo schermo a destra
+            const pX = Math.min(vpLeftEdge + totalBarW + 6, vpRightEdge - 8);
+            vpCtx.fillText('P', pX, y0 + (barHeight / 2));
+        }
+    });
+
+    
+
+    // Pulisce l'eventuale "fantasma" rimasto incastrato nel motore ECharts
+    try { chart.setOption({ graphic: [] }, { replaceMerge: ['graphic'] }); } catch(e){}
+}
+
+// ── VOLUME PROFILE TOOLTIP ──────────────────────────────────────────────
+// Il vp-canvas ha pointer-events:none → catturiamo gli eventi sul master-wrapper
+(function initVpTooltip() {
+    const vpTt       = document.getElementById('vp-tooltip');
+    const masterWrap = document.getElementById('master-wrapper');
+    if (!vpTt || !masterWrap) return;
+
+    let _vpTtRafId = null;
+
+    masterWrap.addEventListener('mousemove', function(e) {
+        if (_vpTtRafId) cancelAnimationFrame(_vpTtRafId);
+        _vpTtRafId = requestAnimationFrame(() => {
+            if (!lastVpRawData || lastVpRawData.length === 0) {
+                vpTt.style.display = 'none'; return;
+            }
+            const rect   = masterWrap.getBoundingClientRect();
+            const mouseX = e.clientX - rect.left;
+            const mouseY = e.clientY - rect.top;
+            const chartW = chart.getWidth();
+            const chartH = chart.getHeight();
+
+            // Zona VP: colonna destra del canvas
+            const vpRightEdge = chartW - 8;
+            const vpLeftEdge  = chartW - 155;
+            if (mouseX < vpLeftEdge - 6 || mouseX > vpRightEdge + 6) {
+                vpTt.style.display = 'none'; return;
+            }
+
+            const r = getYRange();
+            if (!r) { vpTt.style.display = 'none'; return; }
+
+            let grid;
+            try { grid = chart.getModel().getComponent('grid', 0).coordinateSystem.getRect(); }
+            catch(err) { vpTt.style.display = 'none'; return; }
+
+            // Converti mouseY in prezzo usando la scala Y del chart
+            const price = r.max - (mouseY - grid.y) / grid.height * (r.max - r.min);
+            const vpStep = window._vpStep || 10;
+
+            // Trova la barra VP più vicina per Y
+            let best = null, bestDist = Infinity;
+            for (const d of lastVpRawData) {
+                const dist = Math.abs(d[0] - price);
+                if (dist < bestDist) { bestDist = dist; best = d; }
+            }
+            if (!best || bestDist > vpStep * 1.5) { vpTt.style.display = 'none'; return; }
+
+            const [barPrice, buy, sell] = best;
+            const total    = buy + sell;
+            const delta    = buy - sell;
+            const deltaPct = total > 0 ? (delta / total * 100) : 0;
+            const isLong   = delta >= 0;
+            const deltaCol = isLong ? '#a855f7' : '#f97316';
+            const pctAbs   = Math.min(Math.abs(deltaPct), 100);
+            // Larghezza barra interna: 50% = neutro, 100% = massimo squilibrio
+            const barFill  = 50 + (isLong ? pctAbs / 2 : -pctAbs / 2);
+
+            vpTt.innerHTML = `
+              <div class="vp-tt-title">Volume Profile</div>
+              <div class="tt-row"><span class="tt-label">Prezzo</span><span class="tt-val" style="color:#fbbf24;">$${barPrice.toLocaleString()}</span></div>
+              <div class="tt-row"><span class="tt-label">Buy</span><span class="tt-val" style="color:#a855f7;">${fmtVol(buy)} BTC</span></div>
+              <div class="tt-row"><span class="tt-label">Sell</span><span class="tt-val" style="color:#f97316;">${fmtVol(sell)} BTC</span></div>
+              <div class="tt-row"><span class="tt-label">Totale</span><span class="tt-val" style="color:#e8e8ed;">${fmtVol(total)} BTC</span></div>
+              <div class="tt-row"><span class="tt-label">Δ Delta</span><span class="tt-val" style="color:${deltaCol};">${delta >= 0 ? '+' : ''}${fmtVol(delta)} BTC</span></div>
+              <div class="tt-row"><span class="tt-label">Δ %</span><span class="tt-val" style="color:${deltaCol};">${delta >= 0 ? '+' : ''}${deltaPct.toFixed(1)}%</span></div>
+              <div class="vp-delta-bar">
+                <div class="vp-delta-bar-fill" style="width:${barFill.toFixed(1)}%;background:${deltaCol};margin-left:${isLong ? '50%' : barFill.toFixed(1) + '%'};${isLong ? '' : 'margin-left:' + barFill.toFixed(1) + '%;'}"></div>
+              </div>`;
+
+            // Mini bar delta visuale: fill partendo dal centro (50%)
+            // Ri-calcolo semplificato con innerHTML diretto sulla barra
+            const bar = vpTt.querySelector('.vp-delta-bar');
+            if (bar) {
+                if (isLong) {
+                    bar.innerHTML = `<div style="height:4px;background:#1a0a2e;width:50%;display:inline-block;"></div><div style="height:4px;background:${deltaCol};width:${(pctAbs/2).toFixed(1)}%;display:inline-block;border-radius:0 2px 2px 0;"></div>`;
+                } else {
+                    const emptyRight = 50;
+                    const fillW = (pctAbs/2).toFixed(1);
+                    bar.innerHTML = `<div style="height:4px;background:#1a0a2e;width:${(50 - pctAbs/2).toFixed(1)}%;display:inline-block;"></div><div style="height:4px;background:${deltaCol};width:${fillW}%;display:inline-block;border-radius:2px 0 0 2px;"></div>`;
+                }
+            }
+
+            vpTt.style.display = 'block';
+            const ttW = vpTt.offsetWidth || 170;
+            const ttH = vpTt.offsetHeight || 130;
+            let left = mouseX - ttW - 12;
+            if (left < 4) left = mouseX + 12;
+            let top = mouseY - ttH / 2;
+            top = Math.max(4, Math.min(top, chartH - ttH - 4));
+            vpTt.style.left = left + 'px';
+            vpTt.style.top  = top  + 'px';
+        });
+    });
+
+    masterWrap.addEventListener('mouseleave', function() {
+        vpTt.style.display = 'none';
+        if (_vpTtRafId) { cancelAnimationFrame(_vpTtRafId); _vpTtRafId = null; }
+    });
+})();
+
+// --- MAIN CHART ---
+chart.setOption({
+    backgroundColor: 'transparent', 
+    hoverLayerThreshold: 3000,
+    animation: false,
+    animationDurationUpdate: 0,
+    animationEasingUpdate: 'linear',
+    axisPointer: {
+        show: true, // <-- Abilita il tracciamento al passaggio del mouse
+        triggerOn: 'mousemove',
+        link: [{ xAxisIndex: 'all' }],
+        label: { backgroundColor: '#1e1e2e' }
+    },
+    dataZoom: [
+        {
+            type: 'inside',
+            xAxisIndex: [0],
+            zoomOnMouseWheel: false,       // gestito manualmente per zoom 2D
+            moveOnMouseMove: false,        // pan 2D gestito manualmente
+            moveOnMouseWheel: false,
+            zoomLock: false,
+            preventDefaultMouseMove: false
+        },
+        {
+            type: 'slider',
+            xAxisIndex: [0],
+            height: 25,
+            bottom: 10,
+            borderColor: '#2a2e39',
+            fillerColor: 'rgba(104, 22, 131, 0.3)',
+            handleStyle: { color: '#681683', borderColor: '#681683' },
+            textStyle: { color: '#9ca3af' },
+            show: true
+        },
+        {
+            type: 'inside',
+            yAxisIndex: [0],
+            zoomOnMouseWheel: false,       // gestito manualmente per zoom 2D
+            moveOnMouseMove: false,        // pan 2D gestito manualmente
+            moveOnMouseWheel: false,
+            zoomLock: false,
+            preventDefaultMouseMove: false
+        }
+    ],
+
+
+
+    grid: { left: 90, right: 160, top: 35, bottom: 25 },
+    xAxis: { 
+        type: 'time', 
+        splitLine: { 
+            show: true, 
+            lineStyle: { color: '#1f222d', type: 'dashed' } 
+        }, 
+        axisLabel: { 
+            show: true, 
+            color: '#9ca3af', 
+            fontSize: 10,
+            margin: 10,
+            formatter: (value) => {
+                const date = new Date(value);
+                return date.getHours().toString().padStart(2, '0') + ":" + 
+                       date.getMinutes().toString().padStart(2, '0');
+            }
+        },
+        axisLine: {
+            lineStyle: { color: '#2a2e39' } 
+        },
+        // --- 🟢 MODIFICA: ATTIVAZIONE TOOLTIP TEMPO ---
+        axisPointer: { 
+            show: true,
+            type: 'line', // Mostra una linea verticale bianca
+            lineStyle: { 
+                color: '#ffffff',
+                type: 'dashed',
+                width: 1.5,
+                opacity: 0.5
+            },
+            label: {
+                show: true,
+                backgroundColor: '#1e1e2e',
+                color: '#ffffff',
+                fontWeight: 'bold',
+                padding: [4, 8],
+                borderRadius: 3,
+                formatter: (params) => {
+                    const date = new Date(params.value);
+                    const hours = date.getHours().toString().padStart(2, '0');
+                    const minutes = date.getMinutes().toString().padStart(2, '0');
+                    const seconds = date.getSeconds().toString().padStart(2, '0');
+                    return `${hours}:${minutes}:${seconds}`; // Mostra tempo esatto HH:MM:SS
+                }
+            }
+        } 
+    },
+
+    yAxis: { 
+        type: 'value', 
+        scale: true, 
+        position: 'left', 
+        boundaryGap: ['8%', '8%'],
+        splitLine: { lineStyle: { color: '#1f222d' } },
+        axisLabel: { color: '#e8e8ed', fontSize: 11, formatter: val => '$' + val.toLocaleString() },
+        // --- NUOVO: Tooltip orizzontale dinamico ---
+        axisPointer: {
+            show: true,
+            type: 'line',
+            lineStyle: { 
+                color: '#ffffff',   // Linea bianca
+                type: 'dashed',     // Tratteggiata
+                width: 1.5,
+                opacity: 0.8
+            },
+            label: {
+                show: true,
+                backgroundColor: '#1e1e2e',
+                color: '#ffffff',
+                fontWeight: 'bold',
+                padding: [4, 8],
+                borderRadius: 3,
+                formatter: (params) => '$' + params.value.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})
+            }
+        }
+    },
+    series: [
+        // !! NB: nessuna serie Heatmap Bids / Asks !!
+        { name: 'Candles', type: 'candlestick', z: 8, itemStyle: { color: '#681683', color0: '#ffa0ef', borderColor: '#681683', borderColor0: '#ffa0ef', borderWidth: 1 }, data: [] },
+        { name: 'Line', type: 'line', z: 6, symbol: 'none', lineStyle: { color: '#facc15', width: 1.8 }, data: [] },
+        { name: 'PriceLine', type: 'line', z: 10, symbol: 'none', data: [], markLine: { symbol: 'none', animation: false, data: [], label: { position: 'insideEndTop', fontSize: 10, color: '#ffffff', fontWeight: 'bold', backgroundColor: '#1e1e2e', padding: [4,8], borderRadius: 3 }, lineStyle: { color: '#ffffff', width: 1.5, type: 'solid', opacity: 0.3 } } },
+        { name: 'MA', type: 'line', z: 4, symbol: 'none', lineStyle: { color: '#facc15', width: 1.5 }, data: [] },
+        { 
+            name: 'Buy Clusters', 
+            type: 'scatter', 
+            z: 3, 
+            animation: false, 
+            // SCALA NORMALE (Proporzionale per l'area del cerchio)
+            symbolSize: v => {
+                if (v[2] <= 0) return 0;
+                return Math.max(2, Math.min(45, Math.sqrt(v[2]) * 0.85));
+            }, 
+            itemStyle: { color: '#681683', opacity: 0.85 }, 
+            data: [] 
+        },
+        { 
+            name: 'Sell Clusters', 
+            type: 'scatter', 
+            z: 3, 
+            animation: false, 
+            symbolSize: v => {
+                if (v[2] <= 0) return 0;
+                return Math.max(2, Math.min(45, Math.sqrt(v[2]) * 0.85));
+            }, 
+            itemStyle: { color: '#dc143c', opacity: 0.85 }, 
+            data: [] 
+        },
+        { name: 'AI Levels', type: 'line', z: 8, markLine: { symbol: 'none', data: [], animation: false, silent: true }, data: [] },
+        { name: 'DenseBull', type: 'line', z: 5, markLine: { symbol: 'none', data: [], animation: false, silent: true, lineStyle: { color: '#280dd8', width: 2, type: 'solid', opacity: 0.6 }, label: { position: 'start', formatter: ' DBL ', fontSize: 8, color: '#fff', backgroundColor: '#280dd8', padding: [2,4], borderRadius: 2 } }, data: [] },
+        { name: 'DenseBear', type: 'line', z: 5, markLine: { symbol: 'none', data: [], animation: false, silent: true, lineStyle: { color: '#e014a3', width: 2, type: 'solid', opacity: 0.6 }, label: { position: 'start', formatter: ' DS ', fontSize: 8, color: '#fff', backgroundColor: '#e014a3', padding: [2,4], borderRadius: 2 } }, data: [] }
+    ]
+});
+
+
+// ---------- Y-AXIS SLIDER (con limiti dinamici) ----------
+const ySlider = document.getElementById('y-slider');
+const yHandle = document.getElementById('y-slider-handle');
+let sliderDragging = false, sliderResizing = null;
+let sliderStartY, handleStartTop, handleStartHeight;
+let sliderRangeMin = 0, sliderRangeMax = 100000;
+let absoluteMinPrice = null, absoluteMaxPrice = null;  // null = non ancora inizializzato
+
+function updateSliderFromChart() {
+    const r = getYRange();
+    if (!r || !ySlider) return;
+    if (absoluteMinPrice === null || absoluteMaxPrice === null) return;
+    if (absoluteMaxPrice <= absoluteMinPrice) return;
+    
+    const totalH = ySlider.clientHeight;
+    const rangeTotal = absoluteMaxPrice - absoluteMinPrice;
+    if (rangeTotal <= 0 || totalH <= 0) return;
+    
+    const top = ((absoluteMaxPrice - r.max) / rangeTotal) * totalH;
+    const h = ((r.max - r.min) / rangeTotal) * totalH;
+    
+    yHandle.style.top = Math.max(0, Math.min(top, totalH - 16)) + 'px';
+    yHandle.style.height = Math.max(20, Math.min(h, totalH)) + 'px';
+    
+    // Bordo più spesso se l'handle è abbastanza grande da mostrare i controlli di resize
+    const handleH = parseInt(yHandle.style.height);
+    if (handleH > 40) {
+        yHandle.style.borderTopWidth = '4px';
+        yHandle.style.borderBottomWidth = '4px';
+    } else {
+        yHandle.style.borderTopWidth = '2px';
+        yHandle.style.borderBottomWidth = '2px';
+    }
+}
+
+function applySliderRange(min, max) {
+    if (!isFinite(min) || !isFinite(max) || min >= max) return;
+    yAxisMode = 'manual';
+    document.getElementById('btn-live').classList.remove('active');
+    chart.setOption({ yAxis: { min: min, max: max } });
+    sliderRangeMin = min;
+    sliderRangeMax = max;
+    updateSliderFromChart();
+}
+
+function initSliderBounds() {
+    const r = getYRange();
+    if (!r) return;
+    
+    // Se i limiti non sono mai stati impostati, usa il range attuale con ampio padding
+    if (absoluteMinPrice === null || absoluteMaxPrice === null) {
+        const pad = (r.max - r.min) * 0.5;
+        absoluteMinPrice = r.min - pad;
+        absoluteMaxPrice = r.max + pad;
+    } else {
+        // Espandi i limiti solo se il range attuale esce dai bounds
+        const pad = (absoluteMaxPrice - absoluteMinPrice) * 0.05;
+        if (r.min < absoluteMinPrice + pad) absoluteMinPrice = r.min - pad;
+        if (r.max > absoluteMaxPrice - pad) absoluteMaxPrice = r.max + pad;
+    }
+    updateSliderFromChart();
+}
+
+if (yHandle) {
+    yHandle.addEventListener('mousedown', function(e) {
+        e.stopPropagation();
+        e.preventDefault();
+        
+        if (absoluteMinPrice === null || absoluteMaxPrice === null) return;
+        
+        sliderDragging = true;
+        handleStartTop = yHandle.offsetTop;
+        handleStartHeight = yHandle.clientHeight;
+        sliderStartY = e.clientY;
+        sliderRangeMin = getYRange()?.min || absoluteMinPrice;
+        sliderRangeMax = getYRange()?.max || absoluteMaxPrice;
+        
+        const rect = yHandle.getBoundingClientRect();
+        const relY = e.clientY - rect.top;
+        
+        if (relY < 14) {
+            sliderResizing = 'top';
+        } else if (relY > rect.height - 14) {
+            sliderResizing = 'bottom';
+        } else {
+            sliderResizing = null;
+        }
+        
+        document.addEventListener('mousemove', onSliderMove);
+        document.addEventListener('mouseup', onSliderUp);
+    });
+
+    // Rotellina sullo slider per zoom verticale
+    ySlider.addEventListener('wheel', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        if (absoluteMinPrice === null || absoluteMaxPrice === null) return;
+        
+        const r = getYRange();
+        if (!r) return;
+        const center = (r.max + r.min) / 2;
+        const range = r.max - r.min;
+        const factor = e.deltaY > 0 ? 1.12 : 0.89;
+        const newRange = Math.max(50, Math.min(range * factor, absoluteMaxPrice - absoluteMinPrice));
+        const newMin = center - newRange / 2;
+        const newMax = center + newRange / 2;
+        applySliderRange(
+            Math.max(absoluteMinPrice, newMin),
+            Math.min(absoluteMaxPrice, newMax)
+        );
+    }, { passive: false });
+}
+
+function onSliderMove(e) {
+    if (!sliderDragging || !ySlider) return;
+    if (absoluteMinPrice === null || absoluteMaxPrice === null) return;
+    
+    const totalH = ySlider.clientHeight;
+    const rangeTotal = absoluteMaxPrice - absoluteMinPrice;
+    if (rangeTotal <= 0 || totalH <= 0) return;
+    
+    const deltaY = e.clientY - sliderStartY;
+    const pxToPrice = (rangeTotal / totalH) * 0.35;  // sensibilità ridotta
+
+    if (sliderResizing === 'top') {
+        const newTop = Math.max(0, Math.min(handleStartTop + deltaY, handleStartTop + handleStartHeight - 20));
+        const newMax = absoluteMaxPrice - (newTop / totalH) * rangeTotal;
+        const newMin = absoluteMaxPrice - ((handleStartTop + handleStartHeight) / totalH) * rangeTotal;
+        if (isFinite(newMin) && isFinite(newMax) && newMax > newMin + 50) {
+            applySliderRange(newMin, Math.max(newMax, absoluteMinPrice + 50));
+        }
+    } else if (sliderResizing === 'bottom') {
+        const newHeight = Math.max(20, handleStartHeight + deltaY);
+        const newMin = absoluteMaxPrice - ((handleStartTop + newHeight) / totalH) * rangeTotal;
+        const newMax = absoluteMaxPrice - (handleStartTop / totalH) * rangeTotal;
+        if (isFinite(newMin) && isFinite(newMax) && newMax > newMin + 50) {
+            applySliderRange(Math.min(newMin, absoluteMaxPrice - 50), newMax);
+        }
+    } else {
+        const shiftPrice = -deltaY * pxToPrice;
+        let newMin = sliderRangeMin + shiftPrice;
+        let newMax = sliderRangeMax + shiftPrice;
+        const currentRange = newMax - newMin;
+        if (newMin < absoluteMinPrice) { newMin = absoluteMinPrice; newMax = newMin + currentRange; }
+        if (newMax > absoluteMaxPrice) { newMax = absoluteMaxPrice; newMin = newMax - currentRange; }
+        if (newMax > newMin + 50) {
+            applySliderRange(newMin, newMax);
+        }
+    }
+}
+
+function onSliderUp() {
+    sliderDragging = false;
+    sliderResizing = null;
+    document.removeEventListener('mousemove', onSliderMove);
+    document.removeEventListener('mouseup', onSliderUp);
+}
+
+window.addEventListener('resize', function() {
+    initSliderBounds();
+    updateSliderFromChart();
+});
+
+// Blocca aggiornamenti heatmap durante zoom/pan su ECharts
+// --- ZOOM SEPARATO: orizzontale sul grafico, verticale sull'asse Y ---
+function updateCandleWidth() {
+    try {
+        const xAxis = chart.getModel().getComponent('xAxis', 0).axis;
+        const xExtent = xAxis.scale.getExtent();
+        const tMin = xExtent[0];
+        const tMax = xExtent[1];
+        if (!currentCandleData || currentCandleData.length === 0) return;
+
+        // Conta candele visibili nel range
+        let visibleCount = 0;
+        for (let i = 0; i < currentCandleData.length; i++) {
+            const t = currentCandleData[i][0];
+            if (t >= tMin && t <= tMax) visibleCount++;
+        }
+        if (visibleCount === 0) return;
+
+        const grid = chart.getModel().getComponent('grid', 0).coordinateSystem.getRect();
+        const pxPerCandle = grid.width / visibleCount;
+
+        // barWidth = 70% dello spazio per candela, limitato tra 1px e 20px
+        const barWidth = Math.max(1, Math.min(pxPerCandle * 0.2, 10));
+
+        chart.setOption({
+            series: [{ name: 'Candles', barWidth: barWidth }]
+        }, { lazyUpdate: true });
+    } catch(e) {}
+}
+
+chart.on('datazoom', function() {
+    isInteracting = true;
+    clearTimeout(interactionTimeout);
+    interactionTimeout = setTimeout(() => {
+        isInteracting = false;
+        applyHMUpdates();
+        updateClusterLegend();
+    }, 500);
+    updateCandleWidth();
+});
+
+// Variabile per evitare il blocco del thread principale
+let _wheelThrottle = false;
+
+// ── ZOOM PROFESSIONALE 2D: verticale sull'asse Y, orizzontale sull'asse X/grafico ──
+chartDom.addEventListener('wheel', function(e) {
+    e.preventDefault();
+    if (_wheelThrottle) return; // Evita lag: salta gli eventi se stiamo già calcolando
+    
+    _wheelThrottle = true;
+    requestAnimationFrame(() => {
+        try {
+            const grid = chart.getModel().getComponent('grid', 0).coordinateSystem.getRect();
+            const rect = chartDom.getBoundingClientRect();
+            const mouseX = e.clientX - rect.left;
+            const mouseY = e.clientY - rect.top;
+
+            const zoomIn = e.deltaY < 0;
+            const factor = zoomIn ? 0.88 : 1.14;
+
+            const inYAxisArea = mouseX < grid.x;
+
+            if (inYAxisArea) {
+                // ── Zoom VERTICALE centrato sul prezzo sotto il cursore ──
+                const yRange = getYRange();
+                if (!yRange) throw new Error("No Y range");
+                const pxRelY = Math.max(0, Math.min(1, (mouseY - grid.y) / grid.height));
+                const cursorPrice = yRange.max - pxRelY * (yRange.max - yRange.min);
+                const newMin = cursorPrice - (cursorPrice - yRange.min) * factor;
+                const newMax = cursorPrice + (yRange.max - cursorPrice) * factor;
+                yAxisMode = 'manual';
+                document.getElementById('btn-live').classList.remove('active');
+                chart.setOption({ yAxis: { min: newMin, max: newMax } }, { lazyUpdate: true });
+                updateSliderFromChart();
+            } else {
+                // ── Zoom ORIZZONTALE centrato sul timestamp sotto il cursore ──
+                let xExt;
+                try { xExt = chart.getModel().getComponent('xAxis', 0).axis.scale.getExtent(); } catch(_e) { throw _e; }
+                const clampedX = Math.max(grid.x, Math.min(grid.x + grid.width, mouseX));
+                const pxRelX = (clampedX - grid.x) / grid.width;
+                const cursorTime = xExt[0] + pxRelX * (xExt[1] - xExt[0]);
+                const newXMin = cursorTime - (cursorTime - xExt[0]) * factor;
+                const newXMax = cursorTime + (xExt[1] - cursorTime) * factor;
+                
+                yAxisMode = 'manual';
+                document.getElementById('btn-live').classList.remove('active');
+                
+                // FIX: Usare dispatchAction per sincronizzare lo stato interno di ECharts
+                chart.dispatchAction({
+                    type: 'dataZoom',
+                    startValue: newXMin,
+                    endValue: newXMax
+                });
+                updateCandleWidth();
+            }
+            window._hmNeedsRedraw = true;
+        } catch(_err) {}
+        _wheelThrottle = false;
+    });
+}, { passive: false });
+
+// ── PAN 2D: trascina il grafico in tutte le direzioni ──
+let _pan2D = { active: false, startX: 0, startY: 0, startXMin: 0, startXMax: 0, startYMin: 0, startYMax: 0 };
+
+chartDom.addEventListener('mousedown', function(e) {
+    if (e.button !== 0) return;
+    try {
+        const grid = chart.getModel().getComponent('grid', 0).coordinateSystem.getRect();
+        const rect = chartDom.getBoundingClientRect();
+        const mouseX = e.clientX - rect.left;
+        const mouseY = e.clientY - rect.top;
+        const inChart = mouseX >= grid.x && mouseX <= grid.x + grid.width &&
+                        mouseY >= grid.y && mouseY <= grid.y + grid.height;
+        if (!inChart) return;
+        let xExt;
+        const yRange = getYRange();
+        try { xExt = chart.getModel().getComponent('xAxis', 0).axis.scale.getExtent(); } catch(_e) { return; }
+        if (!yRange || !xExt) return;
+        _pan2D = {
+            active: true,
+            startX: e.clientX, startY: e.clientY,
+            startXMin: xExt[0], startXMax: xExt[1],
+            startYMin: yRange.min, startYMax: yRange.max
+        };
+        chartDom.style.cursor = 'grabbing';
+        e.preventDefault();
+    } catch(_err) {}
+});
+
+let _panThrottle = false;
+
+document.addEventListener('mousemove', function(e) {
+    if (!_pan2D.active) return;
+    if (_panThrottle) return; // Evita lag durante il drag
+
+    _panThrottle = true;
+    requestAnimationFrame(() => {
+        try {
+            const grid = chart.getModel().getComponent('grid', 0).coordinateSystem.getRect();
+            const dxPx = e.clientX - _pan2D.startX;
+            const dyPx = e.clientY - _pan2D.startY;
+            const xRange = _pan2D.startXMax - _pan2D.startXMin;
+            const yRange2 = _pan2D.startYMax - _pan2D.startYMin;
+            const dxData = -(dxPx / grid.width)  * xRange;
+            const dyData =  (dyPx / grid.height) * yRange2;
+
+            yAxisMode = 'manual';
+            document.getElementById('btn-live').classList.remove('active');
+
+            // FIX: Per l'asse Y va bene setOption (non ha uno zoom interno conflittuale come l'asse X)
+            chart.setOption({
+                yAxis: { min: _pan2D.startYMin + dyData, max: _pan2D.startYMax + dyData }
+            }, { lazyUpdate: true });
+
+            // FIX: Per l'asse X usiamo dispatchAction per aggiornare la barra dello zoom in basso
+            chart.dispatchAction({
+                type: 'dataZoom',
+                startValue: _pan2D.startXMin + dxData,
+                endValue: _pan2D.startXMax + dxData
+            });
+
+            window._hmNeedsRedraw = true;
+        } catch(_err) {}
+        _panThrottle = false;
+    });
+});
+
+document.addEventListener('mouseup', function(e) {
+    if (_pan2D.active) {
+        _pan2D.active = false;
+        chartDom.style.cursor = 'crosshair';
+        updateSliderFromChart();
+        updateCandleWidth();
+        updateClusterLegend();
+    }
+});
+// ── Fine zoom/pan 2D ────────────────────────────────────────────────────
+
+let lastRafYRange = null;
+let lastRafXRange = null;
+window._obNeedsRedraw = false;
+window._hmNeedsRedraw = true;  // forza il primo disegno
+
+function drawFootprint(fpData, yMin, yMax, xMin, xMax) {
+    const fpCanvas = document.getElementById('fp-canvas');
+    if (!fpCanvas || !chart) return;
+    const ctx = fpCanvas.getContext('2d');
+    const w = chart.getWidth(), h = chart.getHeight();
+    if (fpCanvas.width !== w || fpCanvas.height !== h) {
+        fpCanvas.width = w; fpCanvas.height = h;
+    }
+    ctx.clearRect(0, 0, w, h);
+
+    if (!currentCandleData || currentCandleData.length < 2) return;
+
+    // Distanza in pixel tra le candele attuali
+    const c1X = chart.convertToPixel({xAxisIndex: 0}, currentCandleData[0][0]);
+    const c2X = chart.convertToPixel({xAxisIndex: 0}, currentCandleData[1][0]);
+    const pxPerCandle = Math.abs(c2X - c1X);
+
+    // Condizione trigger: compare solo se c'è ampio spazio tra le candele
+    if (pxPerCandle <= 25) return;
+
+    const pStep = window._vpStep || 10;
+    const yTopPx = chart.convertToPixel({yAxisIndex: 0}, yMax);
+    const yBotPx = chart.convertToPixel({yAxisIndex: 0}, yMin);
+    const pxPerPrice = (yBotPx - yTopPx) / (yMax - yMin);
+    
+    // Altezza della riga con 1px di padding
+    const barH = Math.max(1, Math.abs(pStep * pxPerPrice) - 1);
+    
+    // Calcoliamo l'esatta larghezza dinamica della candela definita da ECharts
+    const candleHalfW = Math.max(1, Math.min(pxPerCandle * 0.7, 40)) / 2;
+    
+    // Lo spazio rimanente tra le candele viene usato per le barre del footprint
+    const maxBarW = (pxPerCandle / 2) - candleHalfW - 2;
+
+    ctx.font = 'bold 9px sans-serif';
+    ctx.textBaseline = 'middle';
+
+    for (const [tsStr, levels] of Object.entries(fpData)) {
+        const ts = parseInt(tsStr) * 1000;
+        if (ts < xMin || ts > xMax) continue;
+
+        const cx = chart.convertToPixel({xAxisIndex: 0}, ts);
+
+        // Trova il volume massimo della candela (POC) per la normalizzazione laterale
+        let maxVol = 0;
+        for (const lvl of levels) {
+            const tot = lvl[1] + lvl[2];
+            if (tot > maxVol) maxVol = tot;
+        }
+        if (maxVol === 0) continue;
+
+        for (const lvl of levels) {
+            const p = lvl[0], buy = lvl[1], sell = lvl[2];
+            if (p < yMin - pStep || p > yMax + pStep) continue;
+
+            const y = chart.convertToPixel({yAxisIndex: 0}, p) - barH / 2;
+
+            const buyW = (buy / maxVol) * maxBarW;
+            const sellW = (sell / maxVol) * maxBarW;
+            const isPoc = (buy + sell) === maxVol;
+
+            // Sell (Arancio) - Proietta verso Sinistra attaccato al bordo sinistro della candela
+            if (sellW > 0) {
+                // Evidenzia il POC (nodo di volume massimo della candela) rendendolo più opaco
+                ctx.fillStyle = isPoc ? 'rgba(249, 115, 22, 0.95)' : 'rgba(249, 115, 22, 0.65)'; 
+                ctx.fillRect(cx - candleHalfW - sellW, y, sellW, barH);
+            }
+            
+            // Buy (Viola) - Proietta verso Destra attaccato al bordo destro della candela
+            if (buyW > 0) {
+                ctx.fillStyle = isPoc ? 'rgba(168, 85, 247, 0.95)' : 'rgba(168, 85, 247, 0.65)'; 
+                ctx.fillRect(cx + candleHalfW, y, buyW, barH);
+            }
+
+            // Testo del volume se lo zoom verticale è profondo (le righe sono spesse)
+            if (barH >= 7 && pxPerCandle >= 10) {
+                ctx.fillStyle = 'rgba(255,255,255,0.85)';
+                if (sell > 200) {
+                    ctx.textAlign = 'right';
+                    ctx.fillText(fmtVol(sell), cx - candleHalfW - 2, y + barH / 2);
+                }
+                if (buy > 200) {
+                    ctx.textAlign = 'left';
+                    ctx.fillText(fmtVol(buy), cx + candleHalfW + 2, y + barH / 2);
+                }
+            }
+        }
+    }
+}
+
+function syncOverlays() {
+    const yExt = getYRange();
+    let xExt = null;
+    try { xExt = chart.getModel().getComponent('xAxis', 0).axis.scale.getExtent(); } catch(e){}
+
+    if (yExt && xExt) {
+        const epsY = (yExt.max - yExt.min) * 0.0001;
+        const epsX = (xExt[1] - xExt[0]) * 0.0001;
+
+        const rangeChanged = !lastRafYRange || !lastRafXRange ||
+            Math.abs(lastRafYRange.min - yExt.min) > epsY ||
+            Math.abs(lastRafYRange.max - yExt.max) > epsY ||
+            Math.abs(lastRafXRange.min - xExt[0]) > epsX ||
+            Math.abs(lastRafXRange.max - xExt[1]) > epsX;
+
+        // Heatmap: throttle a 60ms (evita ridisegno WebGL ad ogni frame durante pan)
+        const now = performance.now();
+        const hmReady = !window._hmLastDraw || (now - window._hmLastDraw) >= 60;
+        if ((rangeChanged || window._hmNeedsRedraw) && hmReady) {
+            lastRafYRange = { min: yExt.min, max: yExt.max };
+            lastRafXRange = { min: xExt[0], max: xExt[1] };
+            drawHeatmapCanvas();
+            window._hmNeedsRedraw = false;
+            window._hmLastDraw = now;
+        }
+
+        // Volume Profile: throttle a 80ms (il disegno Canvas2D è più leggero ma il loop è rapido)
+        const vpReady = !window._vpLastDraw || (now - window._vpLastDraw) >= 80;
+        if ((rangeChanged || window._obNeedsRedraw) && vpReady) {
+            if (lastVpRawData) { drawVolumeProfile(lastVpRawData); window._vpLastDraw = now; }
+            if (lastObData && lastObData.book) drawOrderBook(lastObData.book, lastObData.step, lastPrice, yExt.min, yExt.max);
+            
+            // AGGIUNTA FOOTPRINT
+            drawFootprint(lastFootprintData, yExt.min, yExt.max, xExt[0], xExt[1]);
+            window._obNeedsRedraw = false;
+        }
+    }
+    requestAnimationFrame(syncOverlays);
+}
+requestAnimationFrame(syncOverlays);
+
+// --- INIT ECHARTS DEL DELTA CHART ---
+// NOTE: visualMap piecewise rimosso — instabile senza min/max espliciti e
+// ridondante dato che DeltaPos/DeltaNeg con areaStyle.origin=0 coprono già
+// il riempimento positivo/negativo in modo più affidabile.
+deltaChart.setOption({
+    backgroundColor: 'transparent',
+    animation: false,
+    grid: { left: 4, right: 4, top: 8, bottom: 18, containLabel: false, borderWidth: 0 },
+    dataZoom: [{ type: 'inside', xAxisIndex: [0], zoomOnMouseWheel: true, moveOnMouseMove: true }],
+    axisPointer: { show: false, type: 'none' },
+    tooltip: { show: false },
+    xAxis: {
+        type: 'time',
+        splitLine: { show: false },
+        axisTick: { show: false },
+        axisLine: { show: false },
+        axisLabel: { color: '#6b7280', fontSize: 9 }
+    },
+    yAxis: [
+        {
+            type: 'value', show: false, scale: false,
+            min: -100, max: 100,
+            axisLine: { show: false }, axisTick: { show: false },
+            axisLabel: { show: false }, splitLine: { show: false },
+            splitArea: { show: false }, axisPointer: { show: false }
+        },
+        {
+            type: 'value', show: false, scale: false,
+            min: -100, max: 100,
+            axisLine: { show: false }, axisTick: { show: false },
+            axisLabel: { show: false }, splitLine: { show: false },
+            splitArea: { show: false }, axisPointer: { show: false }
+        }
+    ],
+    series: [
+        {
+            name: 'DeltaLine', type: 'line', yAxisIndex: 0, data: [],
+            smooth: false, symbol: 'none', silent: true,
+            lineStyle: { width: 1.5, color: '#6b7280' }, z: 5
+        },
+        {
+            // Riempimento area positiva: origin:0 → fill da y=0 verso l'alto
+            name: 'DeltaPos', type: 'line', yAxisIndex: 0, data: [],
+            smooth: false, symbol: 'none', silent: true,
+            lineStyle: { width: 0 },
+            areaStyle: { color: '#0db30d', opacity: 0.18, origin: 0 }, z: 2
+        },
+        {
+            // Riempimento area negativa: origin:0 → fill da y=0 verso il basso
+            name: 'DeltaNeg', type: 'line', yAxisIndex: 0, data: [],
+            smooth: false, symbol: 'none', silent: true,
+            lineStyle: { width: 0 },
+            areaStyle: { color: '#c11717', opacity: 0.18, origin: 0 }, z: 2
+        },
+        {
+            name: 'NVEC', type: 'line', yAxisIndex: 1, data: [],
+            smooth: false, symbol: 'none', silent: true,
+            lineStyle: { width: 1, color: '#00f2ff' }, z: 10
+        }
+    ]
+}, true);
+
+// ── TOOLTIP DELTA PANEL ──
+function findNearestValue(arr, targetTs, maxDistMs = 30000) {
+    if (!arr || arr.length === 0) return null;
+    let best = null, bestDist = Infinity;
+    for (const pt of arr) {
+        const dist = Math.abs(pt[0] - targetTs);
+        if (dist < bestDist) { bestDist = dist; best = pt[1]; }
+    }
+    return bestDist <= maxDistMs ? best : null;
+}
+
+const deltaTooltip = document.getElementById('delta-tooltip');
+
+deltaChart.getZr().on('mousemove', function(params) {
+    const evt = params.event;
+    const panel = document.getElementById('delta-panel');
+    const pr = panel.getBoundingClientRect();
+    const point = deltaChart.convertFromPixel({seriesIndex: 0}, [params.offsetX, params.offsetY]);
+    if (!point || point.length < 2) { deltaTooltip.style.display = 'none'; return; }
+    const t = point[0];
+    const deltaVal = findNearestValue(globalDeltaHistory, t);
+    const nvecVal  = findNearestValue(globalNvecHistory, t);
+    const tdVal    = findNearestValue(globalTradeDeltaHistory, t);
+    if (deltaVal === null && nvecVal === null && tdVal === null) {
+        deltaTooltip.style.display = 'none';
+        return;
+    }
+    let html = '';
+    if (deltaVal !== null) {
+        const col = deltaVal >= 0 ? '#0db30d' : '#c11717';
+        html += `<div class="tt-row"><span class="tt-label">OB Delta:</span><span class="tt-val" style="color:${col};">${deltaVal >= 0 ? '+' : ''}${fmtVol(deltaVal)}</span></div>`;
+    }
+    if (tdVal !== null) {
+        const col = tdVal >= 0 ? '#0db30d' : '#c11717';
+        html += `<div class="tt-row"><span class="tt-label">Trade Δ:</span><span class="tt-val" style="color:${col};">${tdVal >= 0 ? '+' : ''}${fmtVol(tdVal)} BTC</span></div>`;
+    }
+    if (nvecVal !== null && uiState.showNvec) {
+        html += `<div class="tt-row"><span class="tt-label">NVEC:</span><span class="tt-val" style="color:#00f2ff;">${nvecVal.toFixed(1)}</span></div>`;
+    }
+    deltaTooltip.innerHTML = html;
+    deltaTooltip.style.display = 'block';
+    let left = (evt.clientX - pr.left) + 14;
+    let top  = (evt.clientY - pr.top) - 10;
+    const tw = deltaTooltip.offsetWidth || 140;
+    if (left + tw > pr.width) left = (evt.clientX - pr.left) - tw - 10;
+    if (top < 0) top = 20;
+    deltaTooltip.style.left = left + 'px';
+    deltaTooltip.style.top  = top + 'px';
+});
+
+deltaChart.getZr().on('mouseout', function() {
+    deltaTooltip.style.display = 'none';
+});
+
+function getYRange() {
+    try {
+        // Il metodo definitivo per allineare Canvas custom (VP/OB) a ECharts
+        // Estrae l'estensione matematica esatta dell'asse Y attualmente renderizzata
+        const yAxis = chart.getModel().getComponent('yAxis', 0).axis;
+        const extent = yAxis.scale.getExtent();
+
+        if (extent && extent.length === 2 && !isNaN(extent[0]) && !isNaN(extent[1])) {
+            return { min: extent[0], max: extent[1] };
+        }
+        return null;
+    } catch (e) { 
+        return null; 
+    }
+}
+
+// --- ORDER BOOK CANVAS ---
+const obCanvas = document.getElementById('ob-canvas');
+const obCtx = obCanvas.getContext('2d');
+
+// Cache volumi OB per smoothing anti-flicker (EMA)
+const _obVolumeCache = { bids: new Map(), asks: new Map(), localMax: 100 };
+const OB_SMOOTHING_ALPHA = 0.25; // 0=mai cambia, 1=istantaneo
+const OB_MAX_DECAY = 0.15;      // quanto scende max quando non c'è più quel volume
+
+function drawOrderBook(book, step, price, yMin, yMax) {
+        const w = obCanvas.clientWidth, h = obCanvas.clientHeight;
+        if (w === 0 || h === 0 || yMin == null || yMax == null) return;
+        obCanvas.width = w; obCanvas.height = h;
+        obCtx.clearRect(0, 0, w, h);
+
+        const pRange = yMax - yMin;
+        if (pRange <= 0) return;
+        
+        const labelW = 48;
+        const barMaxW = w - labelW - 6;
+        
+        // Aumentato padTop da 3 a 18 per fare spazio pulito alla scala superiore
+        const padTop = 18, padBottom = 25, drawH = h - padTop - padBottom; 
+
+        function priceToObY(p) { return padTop + ((yMax - p) / pRange * drawH); }
+
+        // --- 1. ETICHETTE PREZZO SULL'ASSE ---
+        const idealStep = pRange / (drawH / 22);
+        const validSteps = [5, 10, 25, 50, 100, 200, 500, 1000, 2000, 5000];
+        const stepLabels = validSteps.find(s => s >= idealStep) || 5000;
+
+        for (let lbl = Math.ceil(yMin / stepLabels) * stepLabels; lbl <= yMax; lbl += stepLabels) {
+            const y = priceToObY(lbl);
+            if (y == null) continue;
+            obCtx.strokeStyle = 'rgba(42,46,57,0.4)';
+            obCtx.lineWidth = 0.5;
+            obCtx.beginPath(); obCtx.moveTo(labelW, y); obCtx.lineTo(w, y); obCtx.stroke();
+            obCtx.fillStyle = '#6b7280'; obCtx.font = '9px sans-serif'; obCtx.textAlign = 'right';
+            obCtx.textBaseline = 'middle';
+            obCtx.fillText(lbl.toFixed(0), labelW - 4, y);
+        }
+
+        // --- 2. PREPARA DATI (senza ri-aggregazione: dati server già bucketizzati) ---
+        // Usiamo i prezzi dal server direttamente — sono già bucketizzati
+        const bidsMap = new Map();
+        const asksMap = new Map();
+        let instantMax = 0;
+        
+        if (book) {
+            (book.bids || []).forEach(([p, v]) => {
+                if (p >= yMin - step && p <= yMax + step && v > 0) {
+                    bidsMap.set(p, v);
+                    if (v > instantMax) instantMax = v;
+                }
+            });
+            (book.asks || []).forEach(([p, v]) => {
+                if (p >= yMin - step && p <= yMax + step && v > 0) {
+                    asksMap.set(p, v);
+                    if (v > instantMax) instantMax = v;
+                }
+            });
+        }
+
+        // --- 3. SMOOTHING EMA sui volumi ---
+        // I volumi non scompaiono istantaneamente ma decadono gradualmente
+        const smoothBids = new Map();
+        const smoothAsks = new Map();
+        
+        // Decay: volumi che non sono più presenti scendono gradualmente
+        for (const [p, oldV] of _obVolumeCache.bids) {
+            if (!bidsMap.has(p)) {
+                const decayed = oldV * (1 - OB_MAX_DECAY);
+                if (decayed > 0.5) smoothBids.set(p, decayed);
+            }
+        }
+        for (const [p, oldV] of _obVolumeCache.asks) {
+            if (!asksMap.has(p)) {
+                const decayed = oldV * (1 - OB_MAX_DECAY);
+                if (decayed > 0.5) smoothAsks.set(p, decayed);
+            }
+        }
+        
+        // Merge: nuovi volumi con EMA, vecchi con decay
+        for (const [p, newV] of bidsMap) {
+            const oldV = _obVolumeCache.bids.get(p) || 0;
+            const smoothed = oldV + (newV - oldV) * OB_SMOOTHING_ALPHA;
+            smoothBids.set(p, smoothed);
+        }
+        for (const [p, newV] of asksMap) {
+            const oldV = _obVolumeCache.asks.get(p) || 0;
+            const smoothed = oldV + (newV - oldV) * OB_SMOOTHING_ALPHA;
+            smoothAsks.set(p, smoothed);
+        }
+        
+        // Aggiorna cache
+        _obVolumeCache.bids = smoothBids;
+        _obVolumeCache.asks = smoothAsks;
+
+        // --- 4. SMOOTHING su localMax ---
+        // La scala massima non oscilla bruscamente: fast attack, slow decay
+        const prevMax = _obVolumeCache.localMax;
+        if (instantMax > prevMax) {
+            _obVolumeCache.localMax = instantMax; // attacco rapido
+        } else {
+            _obVolumeCache.localMax = prevMax * 0.92 + instantMax * 0.08; // rilascio lento
+        }
+        let localMax = Math.max(100, _obVolumeCache.localMax);
+
+        // --- 5. SCALA DEI VOLUMI (HEADER) ---
+        obCtx.fillStyle = 'rgba(10,10,15,0.95)';
+        obCtx.fillRect(0, 0, w, padTop - 2);
+
+        const scaleY = padTop - 4;
+        obCtx.strokeStyle = '#4b5563';
+        obCtx.lineWidth = 1;
+        obCtx.beginPath(); obCtx.moveTo(labelW + 2, scaleY); obCtx.lineTo(w - 4, scaleY); obCtx.stroke();
+
+        obCtx.fillStyle = '#9ca3af';
+        obCtx.font = 'bold 9px sans-serif'; obCtx.textAlign = 'right'; obCtx.textBaseline = 'bottom';
+        obCtx.fillText('BID', labelW + barMaxW / 2 - 4, scaleY - 1);
+        obCtx.fillStyle = '#ef4444';
+        obCtx.fillText('ASK', w - 5, scaleY - 1);
+
+        // Tacche: 0% al centro, 50% e 100% verso i bordi (simmetrico)
+        const centerX  = labelW + 2 + barMaxW / 2;
+        const halfMaxW = barMaxW / 2;
+        const obVolTicks = [0, 0.5, 1.0];
+        obVolTicks.forEach(volFrac => {
+            const xRight = centerX + Math.sqrt(volFrac) * halfMaxW;
+            const xLeft  = centerX - Math.sqrt(volFrac) * halfMaxW;
+            const label  = volFrac === 0 ? '0' : fmtVol(localMax * volFrac);
+            [xLeft, xRight].forEach((x, idx) => {
+                obCtx.fillStyle = '#9ca3af';
+                obCtx.fillRect(x, scaleY - 3, 1, 3);
+                if (volFrac > 0) {
+                    obCtx.fillStyle = '#d1d5db';
+                    obCtx.textAlign = 'right';
+                    obCtx.fillText(label, x, scaleY - 4);
+                } else {
+                    obCtx.fillStyle = '#d1d5db';
+                    obCtx.textAlign = 'center';
+                    obCtx.fillText(label, x, scaleY - 4);
+                }
+            });
+        });
+
+        // --- 6. DISEGNO BARRE (split: bids sx, asks dx dal centro) ---
+        const center = labelW + 2 + barMaxW / 2;
+        const halfW  = barMaxW / 2;
+
+        const allP = Array.from(new Set([...smoothBids.keys(), ...smoothAsks.keys()])).map(Number).sort((a,b) => a-b);
+
+        allP.forEach(p => {
+            const rawBV = smoothBids.get(p) || 0;
+            const rawAV = smoothAsks.get(p) || 0;
+            
+            // CALCOLO NET VOLUME
+            const netVol = rawBV - rawAV;
+            if (Math.abs(netVol) < 0.1) return; // Salta livelli vuoti
+            
+            // Assegna il volume residuo alla side vincente
+            const bV = netVol > 0 ? netVol : 0;
+            const aV = netVol < 0 ? Math.abs(netVol) : 0;
+
+            const y = priceToObY(p);
+            const rowH = Math.max(1.5, Math.abs(priceToObY(p) - priceToObY(p + step)));
+
+            // Asks: crescono da center verso destra
+            if (aV > 0) {
+                const wFrac = Math.sqrt(aV / localMax);
+                const barW  = wFrac * halfW;
+                let color;
+                if (wFrac <= 0.5) color = lerpColor('#220101', '#a70006', wFrac / 0.5);
+                else              color = lerpColor('#a70006', '#fca5a5', (wFrac - 0.5) / 0.5);
+                obCtx.fillStyle = color;
+                obCtx.fillRect(center, y - rowH / 2, barW, rowH);
+            }
+            // Bids: crescono da center verso sinistra
+            if (bV > 0) {
+                const wFrac = Math.sqrt(bV / localMax);
+                const barW  = wFrac * halfW;
+                let color;
+                if (wFrac <= 0.5) color = lerpColor('#1a0122', '#681683', wFrac / 0.5);
+                else              color = lerpColor('#681683', '#d8b4fe', (wFrac - 0.5) / 0.5);
+                obCtx.fillStyle = color;
+                obCtx.fillRect(center - barW, y - rowH / 2, barW, rowH);
+            }
+        });
+
+        // Linea divisoria centrale
+        obCtx.strokeStyle = 'rgba(75,85,99,0.5)';
+        obCtx.lineWidth = 1;
+        obCtx.setLineDash([2, 2]);
+        obCtx.beginPath();
+        obCtx.moveTo(center, padTop);
+        obCtx.lineTo(center, h - padBottom);
+        obCtx.stroke();
+        obCtx.setLineDash([]);
+
+        // --- 7. LINEA PREZZO ---
+        const yPrice = priceToObY(price);
+        if (yPrice != null) {
+            obCtx.strokeStyle = '#ffffff'; obCtx.setLineDash([4, 2]); obCtx.lineWidth = 1.5;
+            obCtx.beginPath(); obCtx.moveTo(0, yPrice); obCtx.lineTo(w, yPrice); obCtx.stroke(); obCtx.setLineDash([]);
+            obCtx.fillStyle = '#1e1e2e'; obCtx.fillRect(2, yPrice - 9, 52, 18);
+            obCtx.fillStyle = '#d1d5db'; obCtx.textAlign = 'left'; obCtx.textBaseline = 'middle'; obCtx.font = 'bold 9px sans-serif'; 
+            obCtx.fillText(price.toFixed(0), 5, yPrice);
+        }
+    }
+
+const obRo = new ResizeObserver(() => {
+    const r = getYRange();
+    if (r && lastObData) drawOrderBook(lastObData.book, lastObData.step, lastObData.price, r.min, r.max);
+});
+obRo.observe(obCanvas);
+
+// FIX 2.3: Rimosso setInterval 50ms per il redraw OB. Ora gestito dal
+// loop requestAnimationFrame syncOverlays() sopra, che è più fluido e sincronizzato.
+
+// --- UPDATE UI ---
+function updateUI(data) {
+
+    // --- 🟢 AGGIORNAMENTO BADGE AI (Aggiungi questo blocco) ---
+    const ai = data.bot?.ai_status;
+    const badge = document.getElementById('ai-badge');
+    const dateText = document.getElementById('model-date');
+
+    if (ai && badge && dateText) {
+        if (ai.active) {
+            badge.textContent = "AI ACTIVE";
+            badge.className = "ai-badge ai-active";
+            dateText.textContent = "Train: " + ai.last_train;
+        } else {
+            badge.textContent = "STANDARD MODE";
+            badge.className = "ai-badge ai-standard";
+            dateText.textContent = "Logic: Fixed Weights";
+        }
+    }
+    // -------------------------------------------------------
+
+    if (data.footprint) lastFootprintData = data.footprint; // <--- AGGIUNTO
+    const price = data.price || 0;
+    lastPrice = price;
+    currentObStep = data.orderbook_step || 10;
+
+    // GUARD TF: i metadati heatmap (t_interval, p_interval, hm_start_ts) devono essere
+    // accettati SOLO se il JSON appartiene al TF attualmente selezionato dal client.
+    // JSON obsoleti del vecchio TF arrivano ancora per 1-2 cicli dopo il cambio e
+    // NUOVO: metadati bucket-based dal JSON
+    const _jsonTF = data.current_tf;
+    const _activeTF = document.querySelector('.btn-tf.active-tf')?.dataset.tf;
+    const _hmJsonMatchesTF = !_jsonTF || _jsonTF === _activeTF;
+
+    if (_hmJsonMatchesTF) {
+        if (data.heatmap_bucket_duration) window._hmBucketDuration = data.heatmap_bucket_duration;
+        if (data.vp_step) window._hmPInterval = data.vp_step;
+    }
+    if (data.vp_step) window._vpStep = data.vp_step;
+    // ═══════════════════════════════════════════════════════════════════════════
+    // 🎨 COLORI HEATMAP — ARRIVANO DAL SERVER (override dei default)
+    // ═══════════════════════════════════════════════════════════════════════════
+    if (data.heatmap_colors) {
+        hmColorParams = data.heatmap_colors;
+        const cs = data.heatmap_colors;
+        window._hmColorParams.th = cs.min_volume || 0.4;
+        
+        // 1. BLINDA I COLORI ASSOLUTI (Asks/Vendite)
+        window._hmColorParams._baseColors = [
+            '#0d1f0d',   // [0] Verde Scuro
+            '#166534',   // [1] Verde Bosco
+            '#4ade80',   // [2] Verde Brillante
+            '#facc15',   // [3] Giallo
+            '#fb923c',   // [4] Arancione
+            '#ef4444',   // [5] Rosso
+            '#ffffff'    // [6] Bianco
+        ];
+        window._hmColorParams.colors = window._hmColorParams._baseColors;
+
+        // 2. BLINDA I COLORI BLU (Bids/Acquisti)
+        window._hmColorParams.blueColors = [
+            '#030d1f',  // [0] Blu scurissimo (quasi nero)
+            '#0f3373',  // [1] Blu navy
+            '#154da6',  // [2] Blu cobalto
+            '#1e66d9',  // [3] Blu brillante
+            '#3384f5',  // [4] Azzurro forte
+            '#59abff',  // [5] Azzurro cielo
+            '#e6f5ff'   // [6] Azzurro ghiaccio (Bianco accecante)
+        ];
+        
+        // 3. BLINDA LE SOGLIE PER BASSA VOLATILITÀ
+        window._hmColorParams._baseThresholds = [100, 300, 600, 1000, 2000, 4000];
+        window._hmColorParams.thresholds = window._hmColorParams._baseThresholds;
+    }
+
+    const currentTF = data.current_tf || document.querySelector('.btn-tf.active-tf')?.dataset.tf || '1h';
+    updateClusterLegend(currentTF);
+
+    if (data.delta_history) globalDeltaHistory = mergeTimeSeries(globalDeltaHistory, data.delta_history);
+    if (data.trade_delta_history) globalTradeDeltaHistory = mergeTimeSeries(globalTradeDeltaHistory, data.trade_delta_history);
+    if (data.ob_power_history) globalObPowerHistory = mergeTimeSeries(globalObPowerHistory, data.ob_power_history);
+    if (data.bot_history) globalBotHistory = mergeTimeSeries(globalBotHistory, data.bot_history);
+    if (data.nvec_history) globalNvecHistory = mergeTimeSeries(globalNvecHistory, data.nvec_history);
+
+    if (data.current_tf) updateObFilterBadge(data.current_tf);
+
+    const candleData = (data.candles || []).map(c => [c.ts * 1000, c.o, c.c, c.l, c.h]);
+
+    // FIX REATTIVITÀ: Sovrascrive il Close dell'ultima candela con il prezzo tick ad alta frequenza
+    if (candleData.length > 0 && price > 0) {
+        const lastIdx = candleData.length - 1;
+        candleData[lastIdx][2] = price; // Forza il Close = Prezzo Live
+        if (price > candleData[lastIdx][4]) candleData[lastIdx][4] = price; // Estendi High se necessario
+        if (price < candleData[lastIdx][3]) candleData[lastIdx][3] = price; // Estendi Low se necessario
+    }
+
+    // appendData per candele: aggiunge solo quelle nuove, evitando setOption completo
+    if (candleData.length > 0) {
+        const newCandles = candleData.filter(c => c[0] > lastCandleTs);
+        if (newCandles.length > 0 && lastCandleTs > 0) {
+            chart.appendData({ seriesIndex: 0, data: newCandles });
+        } else if (lastCandleTs === 0) {
+            chart.setOption({ series: [{ name: 'Candles', data: candleData }] });
+        } else {
+            // Nessuna candela nuova ma il close dell'ultima è aggiornato col prezzo live:
+            // sovrascriviamo solo l'ultimo punto per mantenere la candela corrente fresca.
+            const last = candleData[candleData.length - 1];
+            chart.setOption({ series: [{ name: 'Candles', data: [{ coord: last }] }] },
+                { lazyUpdate: true });
+            // Approccio più diretto: aggiorniamo l'intera serie solo se serve
+            // (ma solo una volta al secondo max per non saturare il renderer)
+            const nowSec = Math.floor(Date.now() / 1000);
+            if (!chart._lastFullRefresh || nowSec > chart._lastFullRefresh) {
+                chart._lastFullRefresh = nowSec;
+                chart.setOption({ series: [{ name: 'Candles', data: candleData }] },
+                    { lazyUpdate: true });
+            }
+        }
+        lastCandleTs = candleData[candleData.length - 1][0];
+    } else {
+        lastCandleTs = 0;
+    }
+
+    currentCandleData = candleData;
+
+        // Aggiorna limiti assoluti per lo slider Y (dinamici, seguono il prezzo)
+    if (candleData.length > 0) {
+        let minEver = Infinity, maxEver = -Infinity;
+        candleData.forEach(c => {
+            if (c[3] < minEver) minEver = c[3];
+            if (c[4] > maxEver) maxEver = c[4];
+        });
+        if (minEver !== Infinity && maxEver !== -Infinity) {
+            const pad = (maxEver - minEver) * 0.08;
+            // Aggiorna sempre i limiti assoluti con i dati correnti + padding
+            absoluteMinPrice = minEver - pad;
+            absoluteMaxPrice = maxEver + pad;
+        }
+    }
+    initSliderBounds();
+    updateSliderFromChart();
+
+    // Sincronizza lo stato del pulsante LIVE
+    const liveBtn = document.getElementById('btn-live');
+    if (yAxisMode === 'auto') {
+            const latestTs = Date.now(); 
+            
+            // 1. CONFIGURAZIONE GRAFICO PRINCIPALE
+            const tfMs = { '1m': 60000, '5m': 300000, '15m': 900000, '1h': 3600000, '4h': 14400000, '1d': 86400000 };
+            const activeTF = document.querySelector('.btn-tf.active-tf')?.dataset.tf || '1h';
+            const mainWindowMs = (tfMs[activeTF] || 3600000) * 200; // Il tuo valore di 200 candele
+
+            const xMin = latestTs - mainWindowMs;
+            const xMax = latestTs + (mainWindowMs * 0.1);
+
+            // 3. AUTOSCALE ASSE Y
+            let cMin = Infinity, cMax = -Infinity;
+            const visibleCandles = candleData.filter(c => c[0] >= xMin);
+
+            visibleCandles.forEach(c => {
+                if (c[3] < cMin) cMin = c[3];
+                if (c[4] > cMax) cMax = c[4];
+            });
+
+            if (isFinite(cMin) && isFinite(cMax) && cMax > cMin) {
+                const pad = (cMax - cMin) * 0.01;
+                window._autoYMin = cMin - pad;
+                window._autoYMax = cMax + pad;
+            }
+
+            // IL FIX FONDAMENTALE: Sovrascriviamo non solo gli assi, ma anche la memoria del dataZoom!
+            chart.setOption({
+                xAxis: { min: xMin, max: xMax },
+                yAxis: { min: window._autoYMin, max: window._autoYMax },
+                dataZoom: [
+                    { type: 'inside', xAxisIndex: 0, start: 0, end: 100 }
+                ]
+            });
+        }
+    
+    const sMap = {};
+    // Heatmap arriva via messaggio binario WebSocket — non più nel JSON
+
+    const cUp   = data.colors?.candle_up   || '#681683';
+    const cDown = data.colors?.candle_down || '#dc143c';
+    const cBuy  = data.colors?.cluster_buy  || '#681683';
+    const cSell = data.colors?.cluster_sell || '#dc143c';
+
+    // --- 1. MOTORE FRECCE (MARKPOINT) ---
+    const currentDir = data.bot?.direction || 'NEUTRALE';
+    
+    // Se il bot dice LONG o SHORT, e abbiamo i dati della candela
+    if (currentDir !== 'NEUTRALE' && lastCandleTs > 0 && price > 0) {
+        
+        // Controlliamo di non aver già stampato una freccia per questa esatta candela
+        const alreadyLogged = globalTradeSignals.some(sig => sig.coord[0] === lastCandleTs);
+        
+        if (!alreadyLogged) {
+            const isLong = currentDir === 'LONG';
+            globalTradeSignals.push({
+                coord: [lastCandleTs, price], // Le coordinate esatte: [Tempo, Prezzo]
+                symbol: 'arrow',
+                symbolSize: 18,
+                symbolRotate: isLong ? 0 : 180, // Punta in alto per LONG, in basso per SHORT
+                symbolOffset: isLong ? [0, 20] : [0, -20], // Allontana la freccia dal prezzo
+                itemStyle: { 
+                    color: isLong ? '#22c55e' : '#ef4444', // Verde vivo o Rosso vivo
+                    shadowBlur: 6,
+                    shadowColor: '#000'
+                }
+            });
+            // Log in console per farti vedere che sta funzionando
+            console.log("🎯 NUOVA FRECCIA CREATA:", currentDir, "al prezzo", price);
+        }
+    }
+
+    // Pulizia automatica: cancelliamo le frecce più vecchie di 24 ore per non appesantire la RAM
+    const signalCutoff = Date.now() - (24 * 60 * 60 * 1000);
+    globalTradeSignals = globalTradeSignals.filter(sig => sig.coord[0] >= signalCutoff);
+
+    // --- 2. AGGANCIO DELLE FRECCE AL GRAFICO ---
+    const mpConfig = {
+        data: uiState.showAiLevels ? globalTradeSignals : [], // Mostra le frecce solo se AI: ON
+        animation: false
+    };
+
+    if (uiState.showLineChart) {
+        sMap['Candles'] = { data: [], itemStyle: { color: cUp, color0: cDown, borderColor: cUp, borderColor0: cDown, borderWidth: 1 } };
+        // Modalità Linea: agganciamo le frecce alla linea
+        sMap['Line'] = { data: candleData.map(c => [c[0], c[2]]), markPoint: mpConfig };
+    } else {
+        // Modalità Candele (Default): agganciamo le frecce alle candele
+        sMap['Candles'] = { data: candleData, itemStyle: { color: cUp, color0: cDown, borderColor: cUp, borderColor0: cDown, borderWidth: 1 }, markPoint: mpConfig };
+        sMap['Line'] = { data: [] };
+    }
+
+    sMap['PriceLine'] = {
+        markLine: {
+            animation: false,
+            animationDurationUpdate: 0,
+            data: [{
+                yAxis: price,
+                label: {
+                    formatter: `  $${price.toLocaleString('en-US',{minimumFractionDigits:2})}  `,
+                    position: 'insideEndTop',
+                    fontSize: 10,
+                    color: '#ffffff', // <-- Testo bianco
+                    fontWeight: 'bold',
+                    backgroundColor: '#1e1e2e',
+                    padding: [4, 8],
+                    borderRadius: 3
+                },
+                // --- NUOVO STILE: Bianca e trasparente (opacity) ---
+                lineStyle: { color: '#ffffff', width: 1.5, type: 'solid', opacity: 0.3 }
+            }]
+        }
+    };
+    sMap['MA'] = { data: uiState.showMovingAvg && data.ma ? data.ma : [] };
+    if (data.clusters) {
+        // Cluster visibili sopra heatmap (opacity 0.65)
+        sMap['Buy Clusters'] = { data: uiState.showClusters ? data.clusters.buy : [], itemStyle: { color: cBuy, opacity: 0.65 } };
+        sMap['Sell Clusters'] = { data: uiState.showClusters ? data.clusters.sell : [], itemStyle: { color: cSell, opacity: 0.65 } };
+    }
+
+    const aiMarks = [], dBull = [], dBear = [];
+    if (uiState.showAiLevels && data.bot) {
+        const aiLabelStyleBase = {
+            fontSize: 10,
+            color: '#fff',
+            fontWeight: 'bold',
+            backgroundColor: '#1e1e2e',
+            padding: [4, 6],
+            borderRadius: 3,
+            formatter: '{b}: ${c}'
+        };
+
+        if (data.bot.target > 0) aiMarks.push({
+            yAxis: data.bot.target,
+            name: 'TARGET',
+            label: { ...aiLabelStyleBase, position: 'insideEndTop', backgroundColor: '#0d14d8' },
+            lineStyle: { color: '#0d14d8', type: 'dashed', width: 1.5, opacity: 0.8 }
+        });
+
+        if (data.bot.support > 0) aiMarks.push({
+            yAxis: data.bot.support,
+            name: 'STOP',
+            label: { ...aiLabelStyleBase, position: 'insideEndBottom', backgroundColor: '#e014a3' },
+            lineStyle: { color: '#e014a3', type: 'dashed', width: 1.5, opacity: 0.8 }
+        });
+
+        if (data.bot.target2 > 0) aiMarks.push({
+            yAxis: data.bot.target2,
+            name: 'T2',
+            label: { ...aiLabelStyleBase, position: 'insideEndTop', backgroundColor: '#3b82f6' },
+            lineStyle: { color: '#3b82f6', type: 'dotted', width: 1.5, opacity: 0.6 }
+        });
+    }
+
+    if (data.dense_bull > 0) dBull.push({ yAxis: data.dense_bull });
+    if (data.dense_bear > 0) dBear.push({ yAxis: data.dense_bear });
+    sMap['AI Levels'] = { markLine: { data: aiMarks } };
+    sMap['DenseBull'] = { markLine: { data: dBull } };
+    sMap['DenseBear'] = { markLine: { data: dBear } };
+
+    // FIX 3.1: Unifica tutti gli aggiornamenti serie in un unico setOption batch.
+    // Prima bombardavamo ECharts con 10+ setOption consecutive, invalidando il layer
+    // grafico e causando micro-animazioni e flickering. Ora facciamo un solo merge.
+
+    chart.setOption({ series: Object.keys(sMap).map(name => ({ name, ...sMap[name] })) }, { lazyUpdate: true });
+    setTimeout(() => { updateClusterLegend(); updateCandleWidth(); }, 50); // Piccolo ritardo per permettere a ECharts di aggiornare i dati interni
+
+    if (data.volume_profile && data.volume_profile.length > 0) {
+        lastVpRawData = data.volume_profile;
+        drawVolumeProfile(data.volume_profile);
+    } else {
+        lastVpRawData = null;
+        chart.setOption({ graphic: [{ type: 'group', id: 'vp-overlay', children: [] }] });
+    }
+
+        if (data.delta_history && data.delta_history.length > 0) {
+        const deltaHash = _hashArray(data.delta_history);
+        const nvecHash = _hashArray(data.nvec_history);
+        const dataChanged = (deltaHash !== _lastDeltaHash) || (nvecHash !== _lastNvecHash);
+
+        const maxTs = data.delta_history[data.delta_history.length - 1][0];
+
+        if (dataChanged) {
+            _lastDeltaHash = deltaHash;
+            _lastNvecHash = nvecHash;
+
+            const deltaPosData = globalDeltaHistory.map(([t, v]) => [t, v >= 0 ? v : null]);
+            const deltaNegData = globalDeltaHistory.map(([t, v]) => [t, v < 0 ? v : null]);
+
+            // ── 1. DELTA: usa appendData per i nuovi punti (fast path) ──
+            // Full setOption solo al primo caricamento o quando serve un reset completo.
+            // appendData evita di ri-processare migliaia di punti ad ogni tick WS.
+            const _lastRendTs = deltaChart._lastRenderedTs || 0;
+            const newDeltaPts = globalDeltaHistory.filter(p => p[0] > _lastRendTs);
+            const useAppend   = _lastRendTs > 0 && newDeltaPts.length > 0 && newDeltaPts.length < 20;
+
+            if (useAppend) {
+                // Aggiorna solo i nuovi punti — O(k) invece di O(n)
+                const newPosPts = newDeltaPts.map(([t, v]) => [t, v >= 0 ? v : null]);
+                const newNegPts = newDeltaPts.map(([t, v]) => [t, v < 0  ? v : null]);
+                deltaChart.appendData({ seriesIndex: 0, data: newDeltaPts }); // DeltaLine
+                deltaChart.appendData({ seriesIndex: 1, data: newPosPts  }); // DeltaPos
+                deltaChart.appendData({ seriesIndex: 2, data: newNegPts  }); // DeltaNeg
+                if (uiState.showNvec && globalNvecHistory) {
+                    const newNvecPts = globalNvecHistory.filter(p => p[0] > _lastRendTs);
+                    if (newNvecPts.length > 0) deltaChart.appendData({ seriesIndex: 3, data: newNvecPts });
+                }
+                // Pulizia periodica (1 Hz) per eliminare i punti pruned dal front
+                const now = Date.now();
+                if (!deltaChart._lastCleanup || now - deltaChart._lastCleanup > 2000) {
+                    deltaChart._lastCleanup = now;
+                    deltaChart.setOption({
+                        series: [
+                            { name: 'DeltaLine', data: globalDeltaHistory },
+                            { name: 'DeltaPos',  data: deltaPosData },
+                            { name: 'DeltaNeg',  data: deltaNegData },
+                            { name: 'NVEC', data: uiState.showNvec && globalNvecHistory ? globalNvecHistory : [] }
+                        ]
+                    }, { lazyUpdate: true });
+                }
+            } else {
+                // Full refresh: primo caricamento o reset
+                deltaChart.setOption({
+                    series: [
+                        { name: 'DeltaLine', data: globalDeltaHistory },
+                        { name: 'DeltaPos',  data: deltaPosData },
+                        { name: 'DeltaNeg',  data: deltaNegData },
+                        { name: 'NVEC', data: uiState.showNvec && globalNvecHistory ? globalNvecHistory : [] }
+                    ]
+                }, { lazyUpdate: true });
+                deltaChart._lastCleanup = Date.now();
+            }
+            if (globalDeltaHistory.length > 0) {
+                deltaChart._lastRenderedTs = globalDeltaHistory[globalDeltaHistory.length - 1][0];
+            }
+
+            // ── 2. ASSI Y: calcolo limiti ──
+            let maxAbsDelta = 50;
+            const yAxisWindowMs = 20 * 60 * 1000;
+            const yAxisThreshold = maxTs - yAxisWindowMs;
+
+            for (const [t, v] of globalDeltaHistory) {
+                if (t >= yAxisThreshold && Math.abs(v) > maxAbsDelta) {
+                    maxAbsDelta = Math.abs(v);
+                }
+            }
+
+            let maxAbsNvec = 0;
+            if (uiState.showNvec && globalNvecHistory) {
+                for (const [t, v] of globalNvecHistory) {
+                    if (t >= yAxisThreshold && Math.abs(v) > maxAbsNvec) {
+                        maxAbsNvec = Math.abs(v);
+                    }
+                }
+            }
+
+            const rawDelta = maxAbsDelta * 1.15 + 20;
+            let targetDeltaLimit = Math.ceil(rawDelta / 100) * 100;
+            targetDeltaLimit = Math.max(100, targetDeltaLimit);
+
+            const prevDeltaLimit = deltaChart._lastLimit || 100;
+            if (Math.abs(targetDeltaLimit - prevDeltaLimit) >= 100) {
+                deltaChart._lastLimit = targetDeltaLimit;
+            } else {
+                targetDeltaLimit = prevDeltaLimit;
+            }
+
+            const rawNvec = maxAbsNvec * 1.3 + 10;
+            let targetNvecLimit = Math.ceil(rawNvec / 20) * 20;
+            targetNvecLimit = Math.max(20, targetNvecLimit);
+
+            const prevNvecLimit = deltaChart._lastNvecLimit || 20;
+            if (Math.abs(targetNvecLimit - prevNvecLimit) >= 20) {
+                deltaChart._lastNvecLimit = targetNvecLimit;
+            } else {
+                targetNvecLimit = prevNvecLimit;
+            }
+
+            // Aggiornamento differito degli assi Y (evita race condition)
+            clearTimeout(deltaChart._yUpdateTimer);
+            deltaChart._yUpdateTimer = setTimeout(() => {
+                // NOTA: NON usare replaceMerge:['yAxis'] — azzera la configurazione
+                // dual-axis. Un semplice merge (default) aggiorna solo min/max.
+                deltaChart.setOption({
+                    yAxis: [
+                        { min: -targetDeltaLimit, max: targetDeltaLimit },
+                        { min: -targetNvecLimit, max: targetNvecLimit }
+                    ]
+                }, { lazyUpdate: true });
+            }, 50);
+
+        }
+
+        // ── 3. SCROLL ORIZZONTALE ──
+        if (deltaAutoScroll) {
+            const dWinMs = deltaWindowMinutes * 60 * 1000;
+            deltaChart.setOption({
+                xAxis: { min: maxTs - dWinMs, max: maxTs + (dWinMs * 0.05), splitLine: { show: false } }
+            }, { lazyUpdate: true });
+        }
+
+    } else {
+        _lastDeltaHash = '';
+        _lastNvecHash = '';
+        deltaChart.setOption({
+            series: [
+                { name: 'DeltaLine', data: [] },
+                { name: 'DeltaPos', data: [] },
+                { name: 'DeltaNeg', data: [] },
+                { name: 'NVEC', data: [] }
+            ]
+        }, { lazyUpdate: true });
+    }
+    
+
+    // NUOVO CODICE IN updateUI:
+    if (data.orderbook) {
+        document.getElementById('ob-spread').textContent = `Spread: ${(data.spread || 0).toFixed(2)}`;
+        lastObData = { book: data.orderbook, step: currentObStep, price: price };
+        window._obNeedsRedraw = true; // Segnaliamo al loop che ci sono nuovi dati
+    }
+
+    document.getElementById('bot-direction').textContent = data.bot?.direction || 'NEUTRALE';
+    document.getElementById('bot-direction').style.color = data.bot?.color || '#f59e0b';
+    document.getElementById('bot-prob').textContent = data.bot?.prob ? `${data.bot.prob.toFixed(1)}%` : '';
+
+    let aiDeltaVal = data.bot?.prob ? (data.bot.prob - 50.0).toFixed(1) : '--';
+    document.getElementById('bot-delta').textContent = (aiDeltaVal !== '--' && parseFloat(aiDeltaVal) > 0 ? '+' : '') + aiDeltaVal;
+
+    document.getElementById('bot-power').textContent = (data.ob_power !== undefined && data.ob_power !== null) ? data.ob_power.toFixed(1) : '--';
+    document.getElementById('bot-td').textContent = (data.bot?.trade_delta_current !== undefined && data.bot?.trade_delta_current !== null) ? data.bot.trade_delta_current.toFixed(1) : '--';
+    document.getElementById('bot-td-score').textContent = (data.bot?.trade_delta_score !== undefined && data.bot?.trade_delta_score !== null) ? data.bot.trade_delta_score.toFixed(2) : '--';
+    document.getElementById('bot-td-trend').textContent = (data.bot?.trade_delta_trend !== undefined && data.bot?.trade_delta_trend !== null) ? (data.bot.trade_delta_trend > 0 ? '+' : '') + data.bot.trade_delta_trend.toFixed(2) : '--';
+
+    // Sincronizza TF se il server lo cambia indipendentemente — ma NON retrocedere
+    // _lastServerTF se il JSON è ancora per il vecchio TF durante una transizione.
+    if (data.current_tf) {
+        const activeTFBtn = document.querySelector('.btn-tf.active-tf');
+        const activeTF = activeTFBtn?.dataset.tf;
+        if (data.current_tf === activeTF) {
+            // Il server ha confermato il TF che l'utente ha già selezionato → aggiorna
+            window._lastServerTF = data.current_tf;
+        } else if (!activeTF) {
+            // Nessun bottone attivo (caso iniziale) → aggiorna comunque
+            window._lastServerTF = data.current_tf;
+            document.querySelectorAll('.btn-tf').forEach(b => b.classList.remove('active-tf'));
+            const targetBtn = document.querySelector(`.btn-tf[data-tf="${data.current_tf}"]`);
+            if (targetBtn) targetBtn.classList.add('active-tf');
+        }
+        // Se data.current_tf !== activeTF siamo in transizione: il server non ha ancora
+        // processato il cambio TF del client → non aggiornare _lastServerTF né i bottoni
+    }
+
+    // Segnala che i dati dei modali sono cambiati — l'update avviene sul timer throttled
+    if (activeModals.size > 0) {
+        _modalUpdatePending = true;
+    }
+
+    pruneOldDeltaData();
+}
+function changeTF(tf) {
+    document.querySelectorAll('.btn-tf').forEach(btn => btn.classList.remove('active-tf'));
+    document.querySelector(`.btn-tf[data-tf="${tf}"]`).classList.add('active-tf');
+
+    _hmLoadGeneration++;
+    lastAppliedSeq = 0;
+    _hmInitialized = false;
+    window._hmBucketDuration = CONFIG.HEATMAP_BUCKET_DURATION_BY_TF[tf] || 300;
+    window._hmPInterval = CONFIG.ORDERBOOK_STEP_BY_TF[tf] || 5.0;
+
+    heatmapBuckets.clear();
+    liveBucketKeys.clear();
+    // Reset delta chart render state → forza full setOption al prossimo aggiornamento
+    deltaChart._lastRenderedTs = 0;
+    deltaChart._lastCleanup    = 0;
+
+    chart.showLoading({ text: 'Caricamento...', color: CONFIG.COLOR_CANDLE_UP, textColor: CONFIG.COLOR_FG });
+    chart.setOption({ series: [{ data: [] }] }, { lazyUpdate: true });
+    setTimeout(() => { chart.hideLoading(); }, 1000);
+
+    if (wsConnected && ws && ws.readyState === WebSocket.OPEN) {
+        ws.send(JSON.stringify({ action: 'change_tf', tf: tf }));
+        loadHeatmapSnapshot(tf, false);
+    } else {
+        connectWS();  // era: reconnectWebSocket() — funzione non definita
+    }
+
+    updateObFilterBadge(tf);
+}
+
+
+function updateClusterLegend() {
+    const legend = document.getElementById('cluster-legend');
+    if (!legend) return;
+    
+    // 1. Se l'utente spegne i cluster dal bottone, nascondi tutto
+    if (!uiState.showClusters) {
+        legend.style.display = 'none';
+        return;
+    }
+
+    let minVol = Infinity;
+    let maxVol = -Infinity;
+    let hasData = false;
+
+    // 2. Leggi i dati dal grafico in modo sicuro
+    try {
+        const opt = chart.getOption();
+        if (opt && opt.series) {
+            let viewStart = -Infinity;
+            let viewEnd = Infinity;
+            
+            // Cerca il range visibile (zoom)
+            if (opt.dataZoom && opt.dataZoom.length > 0) {
+                viewStart = opt.dataZoom[0].startValue || -Infinity;
+                viewEnd = opt.dataZoom[0].endValue || Infinity;
+            }
+
+            const seriesNames = ['Buy Clusters', 'Sell Clusters'];
+            for (const s of opt.series) {
+                if (seriesNames.includes(s.name) && s.data) {
+                    for (const pt of s.data) {
+                        const t = pt[0];
+                        const vol = pt[2];
+                        // Considera solo i cluster attualmente nell'inquadratura
+                        if (t >= viewStart && t <= viewEnd && vol > 0) {
+                            hasData = true;
+                            if (vol < minVol) minVol = vol;
+                            if (vol > maxVol) maxVol = vol;
+                        }
+                    }
+                }
+            }
+        }
+    } catch (e) {
+        console.error("Errore lettura dati legenda", e);
+    }
+
+    // 3. MOSTRA SEMPRE LA LEGENDA
+    legend.style.display = 'flex';
+    
+    const calcSize = (vol) => Math.round(Math.max(5, Math.min(45, Math.sqrt(vol) * 0.85)));
+
+    // 4. Se lo schermo è vuoto (no cluster), mostra i valori di Default
+    if (!hasData || minVol === Infinity || maxVol === -Infinity) {
+        legend.innerHTML = `
+            <span>Attesa Cluster:</span>
+            <div class="cl-item"><div class="cl-circle" style="width:10px; height:10px;"></div>100</div>
+            <div class="cl-item"><div class="cl-circle" style="width:20px; height:20px;"></div>1K</div>
+            <div class="cl-item"><div class="cl-circle" style="width:30px; height:30px;"></div>10K+</div>
+        `;
+        return;
+    }
+
+    // 5. Se ci sono cluster, adatta i valori a quelli reali
+    const midVol = (minVol + maxVol) / 2;
+    
+    const minSize = calcSize(minVol);
+    const midSize = calcSize(midVol);
+    const maxSize = calcSize(maxVol);
+
+    legend.innerHTML = `
+        <span>Cluster Visibili:</span>
+        <div class="cl-item">
+            <div class="cl-circle" style="width:${minSize}px; height:${minSize}px;"></div>
+            ${fmtVol(minVol)}
+        </div>
+        <div class="cl-item">
+            <div class="cl-circle" style="width:${midSize}px; height:${midSize}px;"></div>
+            ${fmtVol(midVol)}
+        </div>
+        <div class="cl-item">
+            <div class="cl-circle" style="width:${maxSize}px; height:${maxSize}px;"></div>
+            ${fmtVol(maxVol)}
+        </div>
+    `;
+}
+function changeVPLookback(hours) {
+    ws.send(JSON.stringify({ action: 'change_vp_lookback', hours: parseFloat(hours) }));
+    // Forza ridisegno VP dopo che arrivano nuovi dati (al prossimo updateUI)
+    setTimeout(() => {
+        if (lastVpRawData) drawVolumeProfile(lastVpRawData);
+    }, 1000);
+}
+
+function changeDeltaWindow(minutes) {
+    deltaWindowMinutes = parseInt(minutes) || 10;
+    deltaAutoScroll = true;
+    const latestTs = Date.now();
+    const dWinMs = deltaWindowMinutes * 60 * 1000;
+    deltaChart.setOption({
+        xAxis: { min: latestTs - dWinMs, max: latestTs + (dWinMs * 0.05), splitLine: { show: false } }
+    }, { lazyUpdate: true });
+}
+
+function changeModalWindow(type, minutes) {
+    modalWindowMinutes[type] = parseInt(minutes) || 30;
+    const hc = historyCharts[type];
+    if (!hc) return;
+    const latestTs = Date.now();
+    const winMs = modalWindowMinutes[type] * 60 * 1000;
+    hc.setOption({
+        xAxis: { min: latestTs - winMs, max: latestTs + (winMs * 0.05) }
+    }, { lazyUpdate: true });
+}
+
+function setLiveMode() {
+    yAxisMode = 'auto';
+    deltaAutoScroll = true;
+    const btn = document.getElementById('btn-live');
+    btn.classList.add('active');
+    
+    // Se abbiamo dei dati, facciamo saltare subito il grafico alla posizione corretta
+    if (currentCandleData && currentCandleData.length > 0) {
+        const latestTs = Date.now();
+        const tfMs = { '1m': 60000, '5m': 300000, '15m': 900000, '1h': 3600000, '4h': 14400000, '1d': 86400000 };
+        const currentTF = document.querySelector('.btn-tf.active-tf')?.dataset.tf || '1h';
+        const mainWindowMs = (tfMs[currentTF] || 3600000) * 200;
+        
+        const xMin = latestTs - mainWindowMs;
+        const xMax = latestTs + (mainWindowMs * 0.1);
+        
+        // SYNC delta chart con la sua finestra indipendente (5/10/20 min)
+        const dWinMs = deltaWindowMinutes * 60 * 1000;
+        deltaChart.setOption({ xAxis: { min: latestTs - dWinMs, max: latestTs + (dWinMs * 0.05), splitLine: { show: false } } }, { lazyUpdate: true });
+
+        // Attiviamo una transizione rapida di 300ms per ammorbidire il salto
+        chart.setOption({
+            animationDurationUpdate: 300,
+            xAxis: { min: xMin, max: xMax },
+            yAxis: { min: window._autoYMin, max: window._autoYMax },
+            dataZoom: [
+                { startValue: xMin, endValue: xMax }
+            ]
+        });
+
+        // Spegniamo l'animazione non appena il salto è completato
+        setTimeout(() => { chart.setOption({ animationDurationUpdate: 0 }); }, 350);
+    }
+}
+
+function toggleAction(action, btnId, label) {
+    const s = { 'AI': 'showAiLevels', 'Freeze': 'showHeatmapStatic', 'Spotlight': 'showSpotlight', 'NVEC': 'showNvec', 'Clusters': 'showClusters', 'MA': 'showMovingAvg', 'Style': 'showLineChart' };
+    uiState[s[label]] = !uiState[s[label]];
+    const btn = document.getElementById(btnId);
+    
+    if (btn) {
+        // Abbiamo aggiunto 'Spotlight' qui per fargli fare la lucina Verde/Rossa
+        if (['AI', 'NVEC', 'Clusters', 'MA', 'Spotlight'].includes(label)) {
+            btn.classList.toggle('on', uiState[s[label]]); 
+            btn.classList.toggle('off', !uiState[s[label]]);
+            btn.textContent = `${label}: ${uiState[s[label]] ? 'ON' : 'OFF'}`;
+        } else {
+            btn.classList.toggle('active', uiState[s[label]]);
+            btn.textContent = `${label}: ${uiState[s[label]] ? 'ON' : 'OFF'}`;
+        }
+    }
+    
+    if (label === 'Clusters') updateClusterLegend();
+    
+    // IL MOTORE DELLO SPOTLIGHT: Forza il ridisegno immediato della heatmap!
+    if (label === 'Spotlight') window._hmNeedsRedraw = true; 
+    
+    ws.send(JSON.stringify({ action: action }));
+}
+
+// --- sBLOCCO AUTOSCALE AL DRAG DEL MOUSE + SYNC ASSE X DELTA PANEL ---
+// Quando l'utente trascina o zooma, spegniamo la modalità LIVE
+// e sincronizziamo l'asse X del delta chart con il master chart.
+chart.on('datazoom', function () {
+    yAxisMode = 'manual';
+    document.getElementById('btn-live').classList.remove('active');
+    updateClusterLegend();
+});
+
+// SYNC: zoom sul delta chart aggiorna il master chart (ma non viceversa,
+// cosi il selettore 5/10/20 min del delta panel rimane in controllo)
+deltaChart.on('datazoom', function () {
+    deltaAutoScroll = false;   // l'utente ha interagito → stop autoscroll
+    try {
+        const opt = deltaChart.getOption();
+        if (opt.xAxis && opt.xAxis[0]) {
+            const xMin = opt.xAxis[0].min;
+            const xMax = opt.xAxis[0].max;
+            if (xMin != null && xMax != null) {
+                chart.setOption({ xAxis: { min: xMin, max: xMax } }, { lazyUpdate: true });
+            }
+        }
+    } catch (e) { /* ignora */ }
+});
+
+window.addEventListener('resize', function () {
+    chart.resize(); deltaChart.resize();
+    Object.values(historyCharts).forEach(hc => hc && hc.resize());
+    window._hmNeedsRedraw = true;
+    updateCandleWidth();
+    if (lastVpRawData) setTimeout(() => drawVolumeProfile(lastVpRawData), 100);
+});
+
+function applyHMUpdates() {
+    window._hmNeedsRedraw = true;
+}
+
+window.forceHeatmapRedraw = function() {
+    window._hmNeedsRedraw = true;
+    applyHMUpdates();
+};
+
+
+
+
+// Limiti Y persistenti per i modali (fast attack / slow decay)
+const _modalYLimits = { bot: { max: 100 }, power: { absMax: 100 }, td: { absMax: 100 } };
+
+// Timer throttled per aggiornamento modali: max 1 Hz per eliminare sfarfallio
+setInterval(() => {
+    if (!_modalUpdatePending) return;
+    _modalUpdatePending = false;
+
+    activeModals.forEach(type => {
+        const hc = historyCharts[type];
+        if (!hc) return;
+
+        // 1. Ottieni i dati globali aggiornati
+        let newData = [];
+        if (type === 'bot')       newData = globalBotHistory;
+        else if (type === 'power') newData = globalObPowerHistory;
+        else if (type === 'td')   newData = globalTradeDeltaHistory;
+
+        if (!newData || newData.length === 0) return;
+
+        const customWindowMs = (modalWindowMinutes[type] || 60) * 60 * 1000;
+        const maxTs = newData[newData.length - 1][0];
+
+        // 2. La Chiave: Invece di controllare l'hash, controlliamo l'ultimo timestamp renderizzato
+        let chartData = hc.getOption().series[0].data;
+        let lastRenderedTs = 0;
+        if (chartData && chartData.length > 0) {
+            lastRenderedTs = chartData[chartData.length - 1][0];
+        }
+
+        // 3. Se l'ultimo punto che abbiamo è già stato disegnato, non fare nulla
+        if (maxTs <= lastRenderedTs) {
+            // Aggiorniamo solo l'asse X se necessario (per lo scroll)
+            if (hc.getOption().xAxis[0].max !== maxTs + (customWindowMs * 0.05)) {
+                 hc.setOption({
+                    xAxis: { min: maxTs - customWindowMs, max: maxTs + (customWindowMs * 0.05) }
+                }, { lazyUpdate: true });
+            }
+            return;
+        }
+
+        // 4. Se ci sono nuovi punti, usa APPEND DATA!
+        const newPoints = newData.filter(pt => pt[0] > lastRenderedTs);
+        if (newPoints.length > 0 && lastRenderedTs > 0) {
+            hc.appendData({ seriesIndex: 0, data: newPoints });
+        } else {
+            // Primo caricamento o reset: setOption completo
+            const modalOptions = { 
+                series: [{ data: newData }],
+                xAxis: { min: maxTs - customWindowMs, max: maxTs + (customWindowMs * 0.05) }
+            };
+            hc.setOption(modalOptions);
+            return;
+        }
+
+        // 5. Gestione Asse Y (con isteresi)
+        let yMin = Infinity, yMax = -Infinity;
+        const twentyMinMs = 20 * 60 * 1000;
+        const yCutoff = maxTs - twentyMinMs;
+        for (const pt of newData) {
+            if (pt[0] >= yCutoff) {
+                const v = pt[1];
+                if (v < yMin) yMin = v;
+                if (v > yMax) yMax = v;
+            }
+        }
+        if (!isFinite(yMin) || !isFinite(yMax)) { yMin = 0; yMax = 100; }
+
+        let finalYMin, finalYMax;
+        if (type === 'bot') {
+            finalYMin = 0;
+            finalYMax = 100;
+        } else {
+            // Power e TD: scala simmetrica centrata sullo zero con isteresi
+            const lim = _modalYLimits[type];
+            const absMax = Math.max(Math.abs(yMin), Math.abs(yMax), 10);
+            // Fast attack, slow decay
+            lim.absMax = absMax > lim.absMax ? absMax * 1.1 : lim.absMax * 0.97 + absMax * 0.03;
+            const rounded = Math.ceil(lim.absMax / 10) * 10;
+            finalYMin = -rounded;
+            finalYMax = rounded;
+        }
+
+        // 6. Aggiorna SOLO gli assi, non la serie!
+        hc.setOption({
+            xAxis: { min: maxTs - customWindowMs, max: maxTs + (customWindowMs * 0.05) },
+            yAxis: { min: finalYMin, max: finalYMax }
+        }, { lazyUpdate: true });
+
+    });
+}, 1000);
+
+setInterval(() => { if (wsConnected && ws && ws.readyState === WebSocket.OPEN) ws.send(JSON.stringify({ action: 'ping' })); }, 30000);
+// Inizializza trascinamento su tutte le finestre
+initAllDraggables();
+initResizeHandles();
+// Badge filtro OB: attivo di default su 1H (TF iniziale)
+updateObFilterBadge(document.querySelector('.btn-tf.active-tf')?.dataset.tf || '1h');
+
+// Parsing heatmap binario gestito direttamente nel main thread (ws.onmessage)
+
+
+// --- TOGGLE PANNELLO DELTA INFERIORE ---
+window.isDeltaVisible = true;
+function toggleDeltaPanel() {
+    window.isDeltaVisible = !window.isDeltaVisible;
+    const workspace = document.getElementById('workspace');
+    const btn = document.getElementById('btn-delta-panel');
+
+    if (window.isDeltaVisible) {
+        workspace.classList.remove('hide-delta');
+        btn.classList.add('on');
+        btn.classList.remove('off');
+        btn.textContent = 'Delta: ON';
+    } else {
+        workspace.classList.add('hide-delta');
+        btn.classList.remove('on');
+        btn.classList.add('off');
+        btn.textContent = 'Delta: OFF';
+    }
+
+    // Ricalcolo fluido senza errori
+    setTimeout(() => {
+        chart.resize();
+        if (window.isDeltaVisible && typeof deltaChart !== 'undefined') {
+            deltaChart.resize();
+        }
+        window._hmNeedsRedraw = true;
+        if (typeof updateCandleWidth === 'function') updateCandleWidth();
+        if (typeof updateSliderFromChart === 'function') updateSliderFromChart();
+    }, 50);
+}
+</script>
+</body>
+</html>
